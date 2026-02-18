@@ -254,7 +254,7 @@ export function AddEditMedicineDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md overflow-visible">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
@@ -283,35 +283,6 @@ export function AddEditMedicineDialog({
                 </FormItem>
               )}
             />
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <FormLabel>Descriere</FormLabel>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !form.watch("name")}
-                >
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  {isGenerating ? "Se caută..." : "Caută"}
-                </Button>
-              </div>
-
-              {isGenerating ? (
-                <div className="min-h-[192px] space-y-2 pt-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : (
-                 <div className="min-h-[192px] max-h-72 overflow-y-auto rounded-lg border bg-muted/30 p-4 space-y-4 text-sm">
-                  {renderDescription(form.watch("description"))}
-                </div>
-              )}
-            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -384,7 +355,7 @@ export function AddEditMedicineDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -424,7 +395,7 @@ export function AddEditMedicineDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -439,6 +410,36 @@ export function AddEditMedicineDialog({
                 )}
               />
             </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <FormLabel>Descriere</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !form.watch("name")}
+                >
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {isGenerating ? "Se caută..." : "Caută"}
+                </Button>
+              </div>
+
+              {isGenerating ? (
+                <div className="min-h-[192px] space-y-2 pt-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ) : (
+                 <div className="min-h-[192px] max-h-72 overflow-y-auto rounded-lg border bg-muted/30 p-4 space-y-4 text-sm">
+                  {renderDescription(form.watch("description"))}
+                </div>
+              )}
+            </div>
+
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                 Renunță
