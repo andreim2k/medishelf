@@ -343,6 +343,9 @@ export function AddEditMedicineDialog({
               />
             </div>
             <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                Renunță
+              </Button>
               <Button type="submit">Salvează</Button>
             </DialogFooter>
           </form>
