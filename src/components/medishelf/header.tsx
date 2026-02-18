@@ -38,7 +38,7 @@ export function Header() {
             >
               <LogoIcon className="h-7 w-7 flex-shrink-0" />
               <span className="font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
-                PillVentory
+                medVentory
               </span>
             </Link>
             {navItems.map((item) => (
@@ -61,14 +61,14 @@ export function Header() {
       <div className="hidden items-center gap-2 sm:flex">
         <LogoIcon className="h-7 w-7" />
         <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
-          PillVentory
+          medVentory
         </div>
       </div>
       
       <Link href="/" className="flex items-center gap-2 sm:hidden">
         <LogoIcon className="h-7 w-7" />
         <div className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
-          PillVentory
+          medVentory
         </div>
       </Link>
 

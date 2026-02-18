@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/medishelf/sidebar";
 import { Header } from "@/components/medishelf/header";
 
 export const metadata: Metadata = {
-  title: "PillVentory",
+  title: "medVentory",
   description: "Organizează-ți medicamentele inteligent.",
 };
 

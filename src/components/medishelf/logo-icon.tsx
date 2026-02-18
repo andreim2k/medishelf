@@ -10,7 +10,7 @@ export function LogoIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       className={cn("text-[hsl(var(--primary))]", className)}
     >
-      <title>PillVentory Logo</title>
+      <title>medVentory Logo</title>
       
       {/* Pill organizer box */}
       <rect

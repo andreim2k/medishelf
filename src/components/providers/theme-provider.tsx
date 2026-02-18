@@ -20,7 +20,7 @@ export const ThemeProviderContext =
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
-  storageKey = "medishelf-theme",
+  storageKey = "medventory-theme",
 }: {
   children: React.ReactNode;
   defaultTheme?: Theme;
