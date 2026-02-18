@@ -12,57 +12,48 @@ export function LogoIcon({ className }: { className?: string }) {
     >
       <title>PillVentory Logo</title>
       <defs>
-        <linearGradient id="pill-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="hsl(var(--primary))" />
-          <stop offset="100%" stopColor="hsl(var(--accent))" />
-        </linearGradient>
-        <linearGradient id="pill-shine" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
-          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+        <linearGradient id="pill-grad-v2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#8b5cf6" />
         </linearGradient>
       </defs>
-
-      {/* Main capsule pill body - rotated */}
-      <rect
-        x="8"
-        y="6"
-        width="16"
-        height="20"
-        rx="8"
-        fill="url(#pill-grad)"
-        transform="rotate(-30 16 16)"
-      />
-
-      {/* Pill shine/highlight */}
-      <ellipse
-        cx="12"
-        cy="10"
-        rx="2.5"
-        ry="5"
-        fill="url(#pill-shine)"
-        transform="rotate(-30 12 10)"
-      />
-
-      {/* Center line of capsule */}
-      <line
-        x1="16"
-        y1="5"
-        x2="16"
-        y2="27"
-        stroke="rgba(255,255,255,0.2)"
-        strokeWidth="1"
-        transform="rotate(-30 16 16)"
-      />
 
       {/* Decorative ring */}
       <circle
         cx="16"
         cy="16"
         r="14"
-        stroke="hsl(var(--primary))"
+        stroke="#6366f1"
         strokeWidth="1.5"
         fill="none"
-        opacity="0.4"
+        opacity="0.3"
+      />
+
+      {/* Main capsule pill body - using path instead of rotated rect for better mobile support */}
+      <path
+        d="M22 6 C26 10 26 22 22 26 C18 30 10 30 6 26 C2 22 2 10 6 6 C10 2 18 2 22 6 Z"
+        fill="url(#pill-grad-v2)"
+      />
+
+      {/* Center line of capsule */}
+      <line
+        x1="9"
+        y1="9"
+        x2="19"
+        y2="23"
+        stroke="rgba(255,255,255,0.3)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* Highlight */}
+      <ellipse
+        cx="11"
+        cy="9"
+        rx="3"
+        ry="5"
+        transform="rotate(45 11 9)"
+        fill="rgba(255,255,255,0.2)"
       />
     </svg>
   );
