@@ -79,13 +79,13 @@ export function MedicineDetailsDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-2xl">{medicine.name}</DialogTitle>
-          <DialogDescription className="flex items-center gap-4 pt-1">
+          <div className="flex items-center gap-4">
+            <DialogTitle className="text-2xl">{medicine.name}</DialogTitle>
             <StatusBadge expiryDate={medicine.expiryDate} />
-            <span className="flex items-center gap-1.5">
-              <Pill className="h-4 w-4" />
-              {medicine.medicineType}
-            </span>
+          </div>
+          <DialogDescription className="flex items-center gap-1.5 pt-1">
+            <Pill className="h-4 w-4" />
+            {medicine.medicineType}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
@@ -104,7 +104,22 @@ export function MedicineDetailsDialog({
           ) : null}
 
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            {medicine.description && <p>{medicine.description}</p>}
+            {medicine.description &&
+              medicine.description.split("\n").map((line, index) => {
+                if (!line.trim()) return null;
+                // Use a simple regex to find **bolded** text
+                const parts = line.split(/(\*\*.*?\*\*)/g);
+                return (
+                  <p key={index}>
+                    {parts.map((part, i) => {
+                      if (part.startsWith("**") && part.endsWith("**")) {
+                        return <strong key={i}>{part.slice(2, -2)}</strong>;
+                      }
+                      return part;
+                    })}
+                  </p>
+                );
+              })}
           </div>
 
           <div className="mt-2 grid grid-cols-2 gap-4 text-sm">

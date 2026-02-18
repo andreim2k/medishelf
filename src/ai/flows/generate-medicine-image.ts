@@ -39,7 +39,7 @@ const generateMedicineImageFlow = ai.defineFlow(
   async ({ medicineName }) => {
     const { media } = await ai.generate({
       model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `A professional, clean product shot of '${medicineName}', a pharmaceutical drug. The product should be clearly visible on a plain, light-colored background. The image should look realistic and be suitable for an online pharmacy.`,
+      prompt: `A photorealistic, professional, clean product shot of '${medicineName}', a pharmaceutical drug. The product should be clearly visible and centered on a plain, light-colored, studio background. The image should look realistic, high-quality, and be suitable for an online pharmacy catalog.`,
       config: {
         aspectRatio: '4:3',
       },
