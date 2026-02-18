@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,7 +8,6 @@ import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 import type { Medicine } from "@/lib/types";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
-import { generateMedicineImage } from "@/ai/flows/generate-medicine-image";
 
 import {
   Dialog,
@@ -58,8 +56,6 @@ const medicineSchema = z.object({
     .positive("Cantitatea trebuie să fie un număr pozitiv."),
   purchaseDate: z.date({ required_error: "Data cumpărării este obligatorie." }),
   expiryDate: z.date({ required_error: "Data expirării este obligatorie." }),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  imageHint: z.string().optional(),
 });
 
 type AddEditMedicineDialogProps = {
@@ -84,8 +80,6 @@ export function AddEditMedicineDialog({
       description: "",
       medicineType: "Pastilă",
       quantity: 1,
-      imageUrl: "",
-      imageHint: "",
     },
   });
 
@@ -97,8 +91,6 @@ export function AddEditMedicineDialog({
           description: medicineToEdit.description || "",
           purchaseDate: new Date(medicineToEdit.purchaseDate),
           expiryDate: new Date(medicineToEdit.expiryDate),
-          imageUrl: medicineToEdit.imageUrl || "",
-          imageHint: medicineToEdit.imageHint || "",
         });
       } else {
         form.reset({
@@ -109,8 +101,6 @@ export function AddEditMedicineDialog({
           quantity: 1,
           purchaseDate: new Date(),
           expiryDate: undefined,
-          imageUrl: "",
-          imageHint: "",
         });
       }
     }
@@ -125,22 +115,12 @@ export function AddEditMedicineDialog({
       return;
     }
     setIsGenerating(true);
+    form.setValue("description", "");
     try {
-      const [descResult, imageResult] = await Promise.all([
-        generateMedicineDescription({ medicineName: name }),
-        generateMedicineImage({ medicineName: name }),
-      ]);
+      const descResult = await generateMedicineDescription({ medicineName: name });
 
       if (descResult) {
         form.setValue("description", descResult.description, {
-          shouldValidate: true,
-        });
-      }
-      if (imageResult) {
-        form.setValue("imageUrl", imageResult.imageDataUri, {
-          shouldValidate: true,
-        });
-        form.setValue("imageHint", imageResult.imageHint, {
           shouldValidate: true,
         });
       }
@@ -160,9 +140,6 @@ export function AddEditMedicineDialog({
     });
     setIsOpen(false);
   };
-
-  const imageUrl = form.watch("imageUrl");
-  const imageHint = form.watch("imageHint");
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -198,7 +175,7 @@ export function AddEditMedicineDialog({
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <FormLabel>Detalii generate de AI</FormLabel>
+                <FormLabel>Descriere generată de AI</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
@@ -211,37 +188,32 @@ export function AddEditMedicineDialog({
                 </Button>
               </div>
 
-              {isGenerating && !imageUrl ? (
-                <Skeleton className="h-48 w-full rounded-lg" />
-              ) : imageUrl ? (
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                  <Image
-                    src={imageUrl}
-                    alt={form.getValues("name")}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={imageHint || "medicine"}
-                  />
+              {isGenerating ? (
+                <div className="space-y-2 pt-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-1/2" />
                 </div>
-              ) : null}
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Descrierea, utilizarea, substanța activă și efectele secundare vor apărea aici."
-                        {...field}
-                        value={field.value ?? ""}
-                        rows={8}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Descrierea, utilizarea, substanța activă și efectele secundare vor apărea aici."
+                          {...field}
+                          value={field.value ?? ""}
+                          rows={8}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
