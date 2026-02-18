@@ -2,11 +2,12 @@
 
 import { useState, useMemo } from "react";
 import type { ChangeEvent } from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, LayoutGrid, List } from "lucide-react";
 import type { Medicine } from "@/lib/types";
 import { initialMedicines } from "@/lib/data";
 import { AddEditMedicineDialog } from "@/components/medishelf/add-edit-medicine-dialog";
 import { MedicineCard } from "@/components/medishelf/medicine-card";
+import { MedicineListItem } from "@/components/medishelf/medicine-list-item";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,6 +27,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export default function InventoryPage() {
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
@@ -38,6 +48,7 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<"card" | "list">("card");
 
   const handleAddClick = () => {
     setMedicineToEdit(undefined);
@@ -109,6 +120,32 @@ export default function InventoryPage() {
           Your Inventory
         </h1>
         <div className="flex items-center gap-2">
+          <div className="mr-2 flex items-center rounded-lg border bg-card p-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewMode("card")}
+              className={cn(
+                "h-8 w-8",
+                viewMode === "card" &&
+                  "bg-primary/10 text-primary hover:bg-primary/20"
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "h-8 w-8",
+                viewMode === "list" &&
+                  "bg-primary/10 text-primary hover:bg-primary/20"
+              )}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
           <Button onClick={handleAddClick}>
             <Plus className="mr-2 h-4 w-4" />
             Add Medicine
@@ -123,7 +160,9 @@ export default function InventoryPage() {
             placeholder="Search by name..."
             className="pl-10"
             value={searchQuery}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchQuery(e.target.value)
+            }
           />
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -153,15 +192,52 @@ export default function InventoryPage() {
       </div>
 
       {filteredMedicines.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredMedicines.map((medicine) => (
-            <MedicineCard
-              key={medicine.id}
-              medicine={medicine}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
-            />
-          ))}
+        <div>
+          {viewMode === "card" ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredMedicines.map((medicine) => (
+                <MedicineCard
+                  key={medicine.id}
+                  medicine={medicine}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteClick}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="overflow-hidden border bg-card/60 shadow-lg backdrop-blur-xl dark:bg-card/20">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Status
+                    </TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Type
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Quantity
+                    </TableHead>
+                    <TableHead className="hidden lg:table-cell">
+                      Expiry
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredMedicines.map((medicine) => (
+                    <MedicineListItem
+                      key={medicine.id}
+                      medicine={medicine}
+                      onEdit={handleEditClick}
+                      onDelete={handleDeleteClick}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed py-24 text-center">
@@ -193,7 +269,9 @@ export default function InventoryPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
