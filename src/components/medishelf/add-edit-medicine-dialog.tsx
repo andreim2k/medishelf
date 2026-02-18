@@ -294,7 +294,7 @@ export function AddEditMedicineDialog({
                   disabled={isGenerating || !form.watch("name")}
                 >
                   <Wand2 className="mr-2 h-4 w-4" />
-                  {isGenerating ? "Se generează..." : "Generează"}
+                  {isGenerating ? "Se caută..." : "Caută"}
                 </Button>
               </div>
 
