@@ -8,4 +8,4 @@ export type Medicine = {
   expiryDate: string; // YYYY-MM-DD
 };
 
-export type ExpiryStatus = "Expirat" | "Expiră în curând" | "Sigur" | "Dată Invalidă";
+export type ExpiryStatus = "Expirat" | "Expiră în curând" | "Valabil" | "Dată Invalidă";

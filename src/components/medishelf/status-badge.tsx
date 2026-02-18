@@ -22,7 +22,7 @@ const getExpiryStatus = (
 
     if (days < 0) return { status: "Expirat", days };
     if (days <= 30) return { status: "Expiră în curând", days };
-    return { status: "Sigur", days };
+    return { status: "Valabil", days };
   } catch (error) {
     return { status: "Dată Invalidă", days: null };
   }
@@ -32,7 +32,7 @@ export function StatusBadge({ expiryDate }: StatusBadgeProps) {
   const [statusInfo, setStatusInfo] = useState<{
     status: ExpiryStatus;
     days: number | null;
-  }>({ status: "Sigur", days: null });
+  }>({ status: "Valabil", days: null });
 
   useEffect(() => {
     setStatusInfo(getExpiryStatus(expiryDate));
@@ -51,11 +51,11 @@ export function StatusBadge({ expiryDate }: StatusBadgeProps) {
       icon: <ShieldAlert className="mr-1.5 h-3.5 w-3.5" />,
       text: `Expiră în ${statusInfo.days} zile`,
     },
-    "Sigur": {
+    "Valabil": {
       className:
         "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30",
       icon: <Shield className="mr-1.5 h-3.5 w-3.5" />,
-      text: "Sigur",
+      text: "Valabil",
     },
     "Dată Invalidă": {
       className: "bg-muted text-muted-foreground",

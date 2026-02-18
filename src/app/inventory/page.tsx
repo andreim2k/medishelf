@@ -189,7 +189,7 @@ export default function InventoryPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toate Statusurile</SelectItem>
-            <SelectItem value="safe">Sigur</SelectItem>
+            <SelectItem value="safe">Valabil</SelectItem>
             <SelectItem value="expiring_soon">Expiră în curând</SelectItem>
             <SelectItem value="expired">Expirat</SelectItem>
           </SelectContent>
