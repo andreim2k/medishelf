@@ -1,6 +1,7 @@
 export type Medicine = {
   id: string;
   name: string;
+  description?: string;
   medicineType: "Pill" | "Liquid" | "Syrup" | "Cream" | "Other";
   quantity: number;
   purchaseDate: string; // YYYY-MM-DD

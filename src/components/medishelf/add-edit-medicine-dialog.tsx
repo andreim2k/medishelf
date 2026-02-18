@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
 import type { Medicine } from "@/lib/types";
+import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 
 import {
   Dialog,
@@ -25,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -38,12 +40,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const medicineSchema = z.object({
   id: z.string(),
   name: z.string().min(2, "Name must be at least 2 characters."),
+  description: z.string().optional(),
   medicineType: z.enum(["Pill", "Liquid", "Syrup", "Cream", "Other"]),
   quantity: z.coerce
     .number()
@@ -66,6 +69,7 @@ export function AddEditMedicineDialog({
   onSave,
   medicineToEdit,
 }: AddEditMedicineDialogProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
   const form = useForm<z.infer<typeof medicineSchema>>({
     resolver: zodResolver(medicineSchema),
   });
@@ -74,6 +78,7 @@ export function AddEditMedicineDialog({
     if (medicineToEdit) {
       form.reset({
         ...medicineToEdit,
+        description: medicineToEdit.description || "",
         purchaseDate: new Date(medicineToEdit.purchaseDate),
         expiryDate: new Date(medicineToEdit.expiryDate),
       });
@@ -81,6 +86,7 @@ export function AddEditMedicineDialog({
       form.reset({
         id: crypto.randomUUID(),
         name: "",
+        description: "",
         medicineType: "Pill",
         quantity: 1,
         purchaseDate: new Date(),
@@ -88,6 +94,24 @@ export function AddEditMedicineDialog({
       });
     }
   }, [medicineToEdit, isOpen, form]);
+
+  const handleGenerateDescription = async () => {
+    const name = form.getValues("name");
+    if (!name) {
+      form.setError("name", { message: "Please enter a name first." });
+      return;
+    }
+    setIsGenerating(true);
+    try {
+      const result = await generateMedicineDescription({ medicineName: name });
+      form.setValue("description", result.description, { shouldValidate: true });
+    } catch (error) {
+      console.error("Failed to generate description", error);
+      // TODO: Show a toast notification to the user
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const onSubmit = (values: z.infer<typeof medicineSchema>) => {
     onSave({
@@ -121,6 +145,36 @@ export function AddEditMedicineDialog({
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Paracetamol 500mg" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Description</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateDescription}
+                      disabled={isGenerating || !form.watch("name")}
+                    >
+                      <Wand2 className="mr-2 h-4 w-4" />
+                      {isGenerating ? "Generating..." : "Generate"}
+                    </Button>
+                  </div>
+                  <FormControl>
+                    <Textarea
+                      placeholder="e.g. Used for treating pain and fever."
+                      {...field}
+                      value={field.value ?? ""}
+                      rows={3}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

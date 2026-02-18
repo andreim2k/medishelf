@@ -22,6 +22,11 @@ export function MedicineListItem({
     <TableRow>
       <TableCell>
         <div className="font-medium">{medicine.name}</div>
+        {medicine.description && (
+          <div className="line-clamp-1 hidden text-sm text-muted-foreground sm:block">
+            {medicine.description}
+          </div>
+        )}
         <div className="text-sm text-muted-foreground lg:hidden">
           Expires {expiryDate}
         </div>

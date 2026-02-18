@@ -36,6 +36,11 @@ export function MedicineCard({
         <CardDescription>{medicine.medicineType}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
+        {medicine.description && (
+          <p className="line-clamp-3 text-sm text-muted-foreground">
+            {medicine.description}
+          </p>
+        )}
         <div className="flex items-center text-sm text-muted-foreground">
           <Package className="mr-2 h-4 w-4" />
           <span>Quantity: {medicine.quantity}</span>
