@@ -37,8 +37,8 @@ export function Header() {
               className="group flex items-center gap-3 text-lg font-semibold"
             >
               <LogoIcon className="h-7 w-7" />
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                Pillventory
+              <span className="font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+                PillVentory
               </span>
             </Link>
             {navItems.map((item) => (
@@ -60,15 +60,15 @@ export function Header() {
       
       <div className="hidden items-center gap-2 sm:flex">
         <LogoIcon className="h-7 w-7" />
-        <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-          Pillventory
+        <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+          PillVentory
         </div>
       </div>
       
       <Link href="/" className="flex items-center gap-2 sm:hidden">
         <LogoIcon className="h-6 w-6" />
-        <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-          Pillventory
+        <div className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+          PillVentory
         </div>
       </Link>
 
