@@ -13,23 +13,15 @@ export function LogoIcon({ className }: { className?: string }) {
       <title>MediShelf Logo</title>
       <path
         d="M12 5V19"
-        stroke="currentColor"
+        stroke="hsl(var(--success))"
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M5 12H19"
-        stroke="currentColor"
+        stroke="hsl(var(--success))"
         strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M5 17H19"
-        stroke="currentColor"
-        strokeOpacity="0.7"
-        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

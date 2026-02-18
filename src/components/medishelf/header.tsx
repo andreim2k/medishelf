@@ -39,7 +39,9 @@ export function Header() {
               <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 <LogoIcon className="h-5 w-5" />
               </div>
-              <span>MediShelf</span>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text font-bold text-transparent">
+                MediShelf
+              </span>
             </Link>
             {navItems.map((item) => (
               <Link
@@ -57,7 +59,9 @@ export function Header() {
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="hidden text-xl font-semibold sm:block">MediShelf</div>
+      <div className="hidden bg-gradient-to-r from-primary to-accent bg-clip-text text-3xl font-bold text-transparent sm:block">
+        MediShelf
+      </div>
       <div className="flex w-full items-center justify-end">
         <ThemeToggle />
       </div>
