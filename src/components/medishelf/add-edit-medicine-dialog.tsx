@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -140,6 +139,98 @@ export function AddEditMedicineDialog({
     });
     setIsOpen(false);
   };
+  
+  const renderDescription = (description?: string) => {
+    if (!description) {
+      return (
+        <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
+          Descrierea va apărea aici după generare.
+        </p>
+      );
+    }
+
+    const sections: { title: string; content: string[] }[] = [];
+    let currentSection: { title: string; content: string[] } | null = null;
+
+    description.split("\n").forEach((line) => {
+      const cleanedLine = line.trim();
+      if (!cleanedLine) return;
+
+      const match = cleanedLine.match(/^\*\*(.*?)\*\*/);
+      if (match) {
+        if (currentSection) {
+          sections.push(currentSection);
+        }
+        const title = match[1].replace(/:$/, "").trim();
+        const restOfLine = cleanedLine
+          .substring(match[0].length)
+          .replace(/^:/, "")
+          .trim();
+        currentSection = { title, content: [] };
+        if (restOfLine) {
+          currentSection.content.push(restOfLine);
+        }
+      } else if (currentSection) {
+        currentSection.content.push(cleanedLine.replace(/^- /, ""));
+      }
+    });
+
+    if (currentSection) {
+      sections.push(currentSection);
+    }
+
+    if (sections.length === 0) {
+      return <p className="text-sm text-muted-foreground">{description}</p>;
+    }
+
+    return sections.map((section, index) => {
+      const isSideEffects = section.title
+        .toLowerCase()
+        .includes("efecte secundare");
+      let sideEffectsComment: string | null = null;
+      let listItems = section.content;
+
+      if (isSideEffects && listItems.length > 1) {
+        const lastLine = listItems[listItems.length - 1];
+        if (
+          lastLine.toLowerCase().startsWith("aceste") ||
+          lastLine.toLowerCase().startsWith("dacă")
+        ) {
+          sideEffectsComment = listItems.pop() || null;
+        }
+      }
+
+      return (
+        <div key={index}>
+          <h4 className="font-semibold tracking-tight text-foreground">
+            {section.title}
+          </h4>
+          <div className="mt-2 space-y-1">
+            {isSideEffects && listItems.length > 0 ? (
+              <>
+                {listItems.map((item, itemIndex) => (
+                  <div key={itemIndex} className="flex items-start">
+                    <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
+                    <span className="text-muted-foreground">{item}</span>
+                  </div>
+                ))}
+                {sideEffectsComment && (
+                  <p className="pt-2 text-sm text-muted-foreground/80">
+                    {sideEffectsComment}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                {section.content.join("\n")}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    });
+  };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -157,7 +248,7 @@ export function AddEditMedicineDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-h-[80vh] space-y-4 px-2 overflow-visible"
+            className="max-h-[80vh] space-y-4 overflow-y-auto px-2"
           >
             <FormField
               control={form.control}
@@ -189,30 +280,16 @@ export function AddEditMedicineDialog({
               </div>
 
               {isGenerating ? (
-                <div className="space-y-2 pt-2">
+                <div className="min-h-[192px] space-y-2 pt-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-1/2" />
                 </div>
               ) : (
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Descrierea, utilizarea, substanța activă și efectele secundare vor apărea aici."
-                          {...field}
-                          value={field.value ?? ""}
-                          rows={8}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                 <div className="min-h-[192px] max-h-72 overflow-y-auto rounded-lg border bg-muted/30 p-4 space-y-4 text-sm">
+                  {renderDescription(form.watch("description"))}
+                </div>
               )}
             </div>
 
