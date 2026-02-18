@@ -46,6 +46,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
+import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 
 type SortableColumn =
   | "name"
@@ -101,13 +102,31 @@ export default function InventoryPage() {
     setIsAlertOpen(false);
   };
 
-  const handleSaveMedicine = (medicine: Medicine) => {
+  const handleSaveMedicine = async (medicine: Medicine) => {
     if (medicineToEdit) {
       setMedicines(
         medicines.map((m) => (m.id === medicine.id ? medicine : m))
       );
     } else {
-      setMedicines([...medicines, { ...medicine, id: crypto.randomUUID() }]);
+      try {
+        const descResult = await generateMedicineDescription({
+          medicineName: medicine.name,
+        });
+        const newMedicine = {
+          ...medicine,
+          id: crypto.randomUUID(),
+          description: descResult.description,
+        };
+        setMedicines([...medicines, newMedicine]);
+      } catch (error) {
+        console.error("Failed to generate description", error);
+        const newMedicine = {
+          ...medicine,
+          id: crypto.randomUUID(),
+          description: "Nu s-a putut genera descrierea.",
+        };
+        setMedicines([...medicines, newMedicine]);
+      }
     }
   };
 
