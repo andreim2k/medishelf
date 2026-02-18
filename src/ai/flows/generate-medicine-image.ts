@@ -1,13 +1,13 @@
 'use server';
 /**
- * @fileOverview A flow to generate an image for a medicine.
+ * @fileOverview A flow to find a relevant image URL for a medicine.
  *
- * - generateMedicineImage - A function that generates an image for a given medicine name.
+ * - generateMedicineImage - A function that generates an image URL for a given medicine name.
  * - GenerateMedicineImageInput - The input type for the generateMedicineImage function.
  * - GenerateMedicineImageOutput - The return type for the generateMedicineImage function.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, devstralModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateMedicineImageInputSchema = z.object({
@@ -18,7 +18,9 @@ export type GenerateMedicineImageInput = z.infer<
 >;
 
 const GenerateMedicineImageOutputSchema = z.object({
-  imageDataUri: z.string().describe('The generated image as a data URI.'),
+  imageDataUri: z
+    .string()
+    .describe('A URL for a relevant image of the medicine.'),
 });
 export type GenerateMedicineImageOutput = z.infer<
   typeof GenerateMedicineImageOutputSchema
@@ -27,28 +29,64 @@ export type GenerateMedicineImageOutput = z.infer<
 export async function generateMedicineImage(
   input: GenerateMedicineImageInput
 ): Promise<GenerateMedicineImageOutput> {
-  return generateMedicineImageFlow(input);
+  return generateMedicineImageUrlFlow(input);
 }
 
-const generateMedicineImageFlow = ai.defineFlow(
+// A prompt to get a good search term from the medicine name
+const generateSearchTermPrompt = ai.definePrompt({
+  name: 'generateMedicineImageSearchTerm',
+  model: devstralModel,
+  input: { schema: GenerateMedicineImageInputSchema },
+  output: {
+    schema: z.object({
+      searchTerm: z
+        .string()
+        .describe(
+          'A 1-2 word search term for a stock photo of the medicine.'
+        ),
+    }),
+  },
+  prompt: `Generate a concise, 1-2 word Unsplash search term for an image representing '{{{medicineName}}}'.
+    Focus on the visual representation.
+    Examples:
+    - "Paracetamol 500mg" -> "white pills"
+    - "Sirop de tuse" -> "syrup bottle"
+    - "Cremă antiseptică" -> "cream tube"
+    - "Vitamina C 1000mg" -> "orange tablets"
+    `,
+});
+
+const generateMedicineImageUrlFlow = ai.defineFlow(
   {
-    name: 'generateMedicineImageFlow',
+    name: 'generateMedicineImageUrlFlow',
     inputSchema: GenerateMedicineImageInputSchema,
     outputSchema: GenerateMedicineImageOutputSchema,
   },
-  async ({ medicineName }) => {
-    const { media } = await ai.generate({
-      model: 'googleai/imagen-4.0-fast-generate-001',
-      prompt: `A photorealistic, professional, clean product shot of '${medicineName}', a pharmaceutical drug. The product should be clearly visible and centered on a plain, light-colored, studio background. The image should look realistic, high-quality, and be suitable for an online pharmacy catalog.`,
-      config: {
-        aspectRatio: '4:3',
-      },
-    });
-
-    if (!media || !media.url) {
-      throw new Error('Failed to generate image.');
+  async (input) => {
+    let imageUrl: string;
+    try {
+      const { output } = await generateSearchTermPrompt(input);
+      if (output?.searchTerm) {
+        imageUrl = `https://source.unsplash.com/400x300/?${encodeURIComponent(
+          output.searchTerm
+        )}`;
+      } else {
+        // Fallback to picsum if search term generation fails
+        imageUrl = `https://picsum.photos/seed/${encodeURIComponent(
+          input.medicineName
+        )}/400/300`;
+      }
+    } catch (error) {
+      console.error(
+        'Failed to generate search term, falling back to picsum.',
+        error
+      );
+      // Fallback to picsum on error
+      imageUrl = `https://picsum.photos/seed/${encodeURIComponent(
+        input.medicineName
+      )}/400/300`;
     }
 
-    return { imageDataUri: media.url };
+    return { imageDataUri: imageUrl };
   }
 );
