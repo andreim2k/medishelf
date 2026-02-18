@@ -122,7 +122,7 @@ export default function InventoryPage() {
     <>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-          Your Inventory
+          Inventarul Tău
         </h1>
         <div className="flex items-center gap-2">
           <div className="mr-2 flex items-center rounded-lg border bg-card p-1">
@@ -153,7 +153,7 @@ export default function InventoryPage() {
           </div>
           <Button onClick={handleAddClick}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Medicine
+            Adaugă Medicament
           </Button>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function InventoryPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by name or description..."
+            placeholder="Caută după nume sau descriere..."
             className="pl-10"
             value={searchQuery}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -172,10 +172,10 @@ export default function InventoryPage() {
         </div>
         <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger>
-            <SelectValue placeholder="Filter by type" />
+            <SelectValue placeholder="Filtrează după tip" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="all">Toate Tipurile</SelectItem>
             {medicineTypes.map((type) => (
               <SelectItem key={type} value={type}>
                 {type}
@@ -185,13 +185,13 @@ export default function InventoryPage() {
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger>
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="Filtrează după status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="safe">Safe</SelectItem>
-            <SelectItem value="expiring_soon">Expiring Soon</SelectItem>
-            <SelectItem value="expired">Expired</SelectItem>
+            <SelectItem value="all">Toate Statusurile</SelectItem>
+            <SelectItem value="safe">Sigur</SelectItem>
+            <SelectItem value="expiring_soon">Expiră în curând</SelectItem>
+            <SelectItem value="expired">Expirat</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -214,20 +214,20 @@ export default function InventoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
+                    <TableHead>Nume</TableHead>
                     <TableHead className="hidden sm:table-cell">
                       Status
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Type
+                      Tip
                     </TableHead>
                     <TableHead className="hidden sm:table-cell">
-                      Quantity
+                      Cantitate
                     </TableHead>
                     <TableHead className="hidden lg:table-cell">
-                      Expiry
+                      Expirare
                     </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="text-right">Acțiuni</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -249,9 +249,9 @@ export default function InventoryPage() {
           <div className="rounded-full border border-dashed p-4">
             <Filter className="h-10 w-10 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-semibold">No Medicines Found</h2>
+          <h2 className="text-xl font-semibold">Nu s-au găsit medicamente</h2>
           <p className="text-muted-foreground">
-            Try adjusting your search or filters, or add a new medicine.
+            Încercați să ajustați căutarea sau filtrele, sau adăugați un medicament nou.
           </p>
         </div>
       )}
@@ -266,16 +266,15 @@ export default function InventoryPage() {
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Sunteți sigur?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              medicine from your inventory.
+              Această acțiune nu poate fi anulată. Acest lucru va șterge permanent medicamentul din inventarul dvs.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Anulează</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete}>
-              Delete
+              Șterge
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

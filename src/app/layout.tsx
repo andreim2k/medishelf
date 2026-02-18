@@ -7,7 +7,7 @@ import { Header } from "@/components/medishelf/header";
 
 export const metadata: Metadata = {
   title: "MediShelf",
-  description: "Manage your medicine inventory with ease.",
+  description: "Gestionați-vă inventarul de medicamente cu ușurință.",
 };
 
 export default function RootLayout({
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
+    <html lang="ro" suppressHydrationWarning className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link

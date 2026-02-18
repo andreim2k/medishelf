@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview A flow to generate a medicine description.
+ * @fileOverview A flow to generate a medicine description in Romanian.
  *
  * - generateMedicineDescription - A function that generates a description for a given medicine name.
  * - GenerateMedicineDescriptionInput - The input type for the generateMedicineDescription function.
@@ -18,10 +18,7 @@ export type GenerateMedicineDescriptionInput = z.infer<
 >;
 
 const GenerateMedicineDescriptionOutputSchema = z.object({
-  descriptionEn: z
-    .string()
-    .describe('A short, one-sentence description of the medicine in English.'),
-  descriptionRo: z
+  description: z
     .string()
     .describe('A short, one-sentence description of the medicine in Romanian.'),
 });
@@ -40,7 +37,7 @@ const prompt = ai.definePrompt({
   model: devstralModel,
   input: { schema: GenerateMedicineDescriptionInputSchema },
   output: { schema: GenerateMedicineDescriptionOutputSchema },
-  prompt: `You are a medical expert. Generate a short, one-sentence description for the following medicine: {{{medicineName}}}. Provide the description in both English and Romanian.`,
+  prompt: `Ești un expert medical. Generează o descriere scurtă, de o singură propoziție, pentru următorul medicament: {{{medicineName}}}. Furnizează descrierea în limba română.`,
 });
 
 const generateMedicineDescriptionFlow = ai.defineFlow(

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
+import { ro } from "date-fns/locale";
 
 type MedicineListItemProps = {
   medicine: Medicine;
@@ -16,7 +17,9 @@ export function MedicineListItem({
   onEdit,
   onDelete,
 }: MedicineListItemProps) {
-  const expiryDate = format(parseISO(medicine.expiryDate), "MMM d, yyyy");
+  const expiryDate = format(parseISO(medicine.expiryDate), "d MMM yyyy", {
+    locale: ro,
+  });
 
   return (
     <TableRow>
@@ -28,7 +31,7 @@ export function MedicineListItem({
           </div>
         )}
         <div className="text-sm text-muted-foreground lg:hidden">
-          Expires {expiryDate}
+          Expiră {expiryDate}
         </div>
       </TableCell>
       <TableCell className="hidden sm:table-cell">
@@ -44,7 +47,7 @@ export function MedicineListItem({
       <TableCell className="text-right">
         <Button variant="ghost" size="icon" onClick={() => onEdit(medicine)}>
           <Pencil className="h-4 w-4" />
-          <span className="sr-only">Edit</span>
+          <span className="sr-only">Editează</span>
         </Button>
         <Button
           variant="ghost"
@@ -53,7 +56,7 @@ export function MedicineListItem({
           onClick={() => onDelete(medicine.id)}
         >
           <Trash2 className="h-4 w-4" />
-          <span className="sr-only">Delete</span>
+          <span className="sr-only">Șterge</span>
         </Button>
       </TableCell>
     </TableRow>

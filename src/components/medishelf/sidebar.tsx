@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/tooltip";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: Home },
-  { href: "/inventory", label: "Inventory", icon: Package },
-  { href: "/reports", label: "Reports", icon: BarChart2 },
+  { href: "/", label: "Panou de control", icon: Home },
+  { href: "/inventory", label: "Inventar", icon: Package },
+  { href: "/reports", label: "Rapoarte", icon: BarChart2 },
 ];
 
 export function Sidebar() {

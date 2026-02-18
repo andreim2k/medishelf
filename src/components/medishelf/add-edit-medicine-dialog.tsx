@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
+import { ro } from "date-fns/locale";
 import type { Medicine } from "@/lib/types";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 
@@ -45,15 +46,15 @@ import { cn } from "@/lib/utils";
 
 const medicineSchema = z.object({
   id: z.string(),
-  name: z.string().min(2, "Name must be at least 2 characters."),
+  name: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere."),
   description: z.string().optional(),
-  medicineType: z.enum(["Pill", "Liquid", "Syrup", "Cream", "Other"]),
+  medicineType: z.enum(["Pastilă", "Lichid", "Sirop", "Cremă", "Altul"]),
   quantity: z.coerce
     .number()
     .int()
-    .positive("Quantity must be a positive number."),
-  purchaseDate: z.date({ required_error: "Purchase date is required." }),
-  expiryDate: z.date({ required_error: "Expiry date is required." }),
+    .positive("Cantitatea trebuie să fie un număr pozitiv."),
+  purchaseDate: z.date({ required_error: "Data cumpărării este obligatorie." }),
+  expiryDate: z.date({ required_error: "Data expirării este obligatorie." }),
 });
 
 type AddEditMedicineDialogProps = {
@@ -87,7 +88,7 @@ export function AddEditMedicineDialog({
         id: crypto.randomUUID(),
         name: "",
         description: "",
-        medicineType: "Pill",
+        medicineType: "Pastilă",
         quantity: 1,
         purchaseDate: new Date(),
         expiryDate: undefined,
@@ -98,14 +99,13 @@ export function AddEditMedicineDialog({
   const handleGenerateDescription = async () => {
     const name = form.getValues("name");
     if (!name) {
-      form.setError("name", { message: "Please enter a name first." });
+      form.setError("name", { message: "Vă rugăm introduceți mai întâi un nume." });
       return;
     }
     setIsGenerating(true);
     try {
       const result = await generateMedicineDescription({ medicineName: name });
-      const bilingualDescription = `EN: ${result.descriptionEn}\n\nRO: ${result.descriptionRo}`;
-      form.setValue("description", bilingualDescription, {
+      form.setValue("description", result.description, {
         shouldValidate: true,
       });
     } catch (error) {
@@ -130,12 +130,12 @@ export function AddEditMedicineDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {medicineToEdit ? "Edit Medicine" : "Add Medicine"}
+            {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
           </DialogTitle>
           <DialogDescription>
             {medicineToEdit
-              ? "Update the details of your medicine."
-              : "Add a new medicine to your inventory."}
+              ? "Actualizați detaliile medicamentului."
+              : "Adăugați un medicament nou în inventarul dvs."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -145,9 +145,9 @@ export function AddEditMedicineDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nume</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Paracetamol 500mg" {...field} />
+                    <Input placeholder="ex: Paracetamol 500mg" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -159,7 +159,7 @@ export function AddEditMedicineDialog({
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center justify-between">
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Descriere</FormLabel>
                     <Button
                       type="button"
                       variant="outline"
@@ -168,12 +168,12 @@ export function AddEditMedicineDialog({
                       disabled={isGenerating || !form.watch("name")}
                     >
                       <Wand2 className="mr-2 h-4 w-4" />
-                      {isGenerating ? "Generating..." : "Generate"}
+                      {isGenerating ? "Se generează..." : "Generează"}
                     </Button>
                   </div>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g. Used for treating pain and fever."
+                      placeholder="ex: RO: Utilizat pentru a trata durerea și a reduce febra. EN: Used to treat pain and reduce fever."
                       {...field}
                       value={field.value ?? ""}
                       rows={4}
@@ -189,7 +189,7 @@ export function AddEditMedicineDialog({
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel>Cantitate</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -202,18 +202,18 @@ export function AddEditMedicineDialog({
                 name="medicineType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>Tip</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Selectează tip" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {["Pill", "Liquid", "Syrup", "Cream", "Other"].map(
+                        {["Pastilă", "Lichid", "Sirop", "Cremă", "Altul"].map(
                           (type) => (
                             <SelectItem key={type} value={type}>
                               {type}
@@ -233,7 +233,7 @@ export function AddEditMedicineDialog({
                 name="purchaseDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Purchase Date</FormLabel>
+                    <FormLabel>Data Cumpărării</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -245,9 +245,9 @@ export function AddEditMedicineDialog({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ro })
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Alege o dată</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -260,6 +260,7 @@ export function AddEditMedicineDialog({
                           onSelect={field.onChange}
                           disabled={(date) => date > new Date()}
                           initialFocus
+                          locale={ro}
                         />
                       </PopoverContent>
                     </Popover>
@@ -272,7 +273,7 @@ export function AddEditMedicineDialog({
                 name="expiryDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Expiry Date</FormLabel>
+                    <FormLabel>Data Expirării</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -284,9 +285,9 @@ export function AddEditMedicineDialog({
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP", { locale: ro })
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Alege o dată</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -298,6 +299,7 @@ export function AddEditMedicineDialog({
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
+                          locale={ro}
                         />
                       </PopoverContent>
                     </Popover>
@@ -307,7 +309,7 @@ export function AddEditMedicineDialog({
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Save</Button>
+              <Button type="submit">Salvează</Button>
             </DialogFooter>
           </form>
         </Form>

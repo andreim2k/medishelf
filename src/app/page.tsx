@@ -19,13 +19,13 @@ import {
 import { initialMedicines } from "@/lib/data";
 
 const generateChartData = () => [
-  { name: "Jan", total: Math.floor(Math.random() * 5) + 1 },
+  { name: "Ian", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Feb", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Mar", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Apr", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "May", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Jun", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Jul", total: Math.floor(Math.random() * 5) + 1 },
+  { name: "Mai", total: Math.floor(Math.random() * 5) + 1 },
+  { name: "Iun", total: Math.floor(Math.random() * 5) + 1 },
+  { name: "Iul", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Aug", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Sep", total: Math.floor(Math.random() * 5) + 1 },
   { name: "Oct", total: Math.floor(Math.random() * 5) + 1 },
@@ -65,57 +65,57 @@ export default function Home() {
     <>
       <div className="flex items-center justify-between">
          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-          Dashboard
+          Panou de control
         </h1>
       </div>
       <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Medicines
+              Total Medicamente
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{initialMedicines.length}</div>
             <p className="text-xs text-muted-foreground">
-              in your inventory
+              în inventarul dvs.
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+            <CardTitle className="text-sm font-medium">Expiră în curând</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{expiringSoonCount}</div>
             <p className="text-xs text-muted-foreground">
-              in the next 30 days
+              în următoarele 30 de zile
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expired</CardTitle>
+            <CardTitle className="text-sm font-medium">Expirate</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">{expiredCount}</div>
             <p className="text-xs text-muted-foreground">
-              items are expired
+              medicamente sunt expirate
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Activity</CardTitle>
+            <CardTitle className="text-sm font-medium">Activitate</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+2</div>
             <p className="text-xs text-muted-foreground">
-              additions this month
+              adăugări în această lună
             </p>
           </CardContent>
         </Card>
@@ -123,9 +123,9 @@ export default function Home() {
       <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader>
-            <CardTitle>Additions Overview</CardTitle>
+            <CardTitle>Rezumat Adăugări</CardTitle>
             <CardDescription>
-              Number of medicines added per month.
+              Numărul de medicamente adăugate pe lună.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -164,9 +164,9 @@ export default function Home() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Recently Added</CardTitle>
+            <CardTitle>Adăugate Recent</CardTitle>
             <CardDescription>
-              You added {initialMedicines.length} medicines in total.
+              Ați adăugat {initialMedicines.length} medicamente în total.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

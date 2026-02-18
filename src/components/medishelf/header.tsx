@@ -13,9 +13,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: Home },
-  { href: "/inventory", label: "Inventory", icon: Package },
-  { href: "/reports", label: "Reports", icon: BarChart2 },
+  { href: "/", label: "Panou de control", icon: Home },
+  { href: "/inventory", label: "Inventar", icon: Package },
+  { href: "/reports", label: "Rapoarte", icon: BarChart2 },
 ];
 
 export function Header() {
@@ -26,7 +26,7 @@ export function Header() {
         <SheetTrigger asChild>
           <Button size="icon" variant="outline" className="sm:hidden">
             <PanelLeft className="h-5 w-5" />
-            <span className="sr-only">Toggle Menu</span>
+            <span className="sr-only">Comută Meniu</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="sm:max-w-xs">

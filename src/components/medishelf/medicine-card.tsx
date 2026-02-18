@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Package, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
+import { ro } from "date-fns/locale";
 
 type MedicineCardProps = {
   medicine: Medicine;
@@ -23,8 +24,12 @@ export function MedicineCard({
   onEdit,
   onDelete,
 }: MedicineCardProps) {
-  const purchaseDate = format(parseISO(medicine.purchaseDate), "MMM d, yyyy");
-  const expiryDate = format(parseISO(medicine.expiryDate), "MMM d, yyyy");
+  const purchaseDate = format(parseISO(medicine.purchaseDate), "d MMM yyyy", {
+    locale: ro,
+  });
+  const expiryDate = format(parseISO(medicine.expiryDate), "d MMM yyyy", {
+    locale: ro,
+  });
 
   return (
     <Card className="flex h-full flex-col overflow-hidden border bg-card/60 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-primary/20 dark:bg-card/20">
@@ -43,21 +48,21 @@ export function MedicineCard({
         )}
         <div className="flex items-center text-sm text-muted-foreground">
           <Package className="mr-2 h-4 w-4" />
-          <span>Quantity: {medicine.quantity}</span>
+          <span>Cantitate: {medicine.quantity}</span>
         </div>
         <div className="flex items-center text-sm text-muted-foreground">
           <Calendar className="mr-2 h-4 w-4" />
-          <span>Purchased: {purchaseDate}</span>
+          <span>Cumpărat: {purchaseDate}</span>
         </div>
         <div className="flex items-center text-sm text-muted-foreground">
           <Calendar className="mr-2 h-4 w-4 text-destructive/80" />
-          <span>Expires: {expiryDate}</span>
+          <span>Expiră: {expiryDate}</span>
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2 bg-muted/30 p-3 dark:bg-black/20">
         <Button variant="ghost" size="icon" onClick={() => onEdit(medicine)}>
           <Pencil className="h-4 w-4" />
-          <span className="sr-only">Edit</span>
+          <span className="sr-only">Editează</span>
         </Button>
         <Button
           variant="ghost"
@@ -66,7 +71,7 @@ export function MedicineCard({
           onClick={() => onDelete(medicine.id)}
         >
           <Trash2 className="h-4 w-4" />
-          <span className="sr-only">Delete</span>
+          <span className="sr-only">Șterge</span>
         </Button>
       </CardFooter>
     </Card>

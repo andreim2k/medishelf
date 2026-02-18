@@ -2,10 +2,10 @@ export type Medicine = {
   id: string;
   name: string;
   description?: string;
-  medicineType: "Pill" | "Liquid" | "Syrup" | "Cream" | "Other";
+  medicineType: "Pastilă" | "Lichid" | "Sirop" | "Cremă" | "Altul";
   quantity: number;
   purchaseDate: string; // YYYY-MM-DD
   expiryDate: string; // YYYY-MM-DD
 };
 
-export type ExpiryStatus = "Expired" | "Expiring Soon" | "Safe" | "Invalid Date";
+export type ExpiryStatus = "Expirat" | "Expiră în curând" | "Sigur" | "Dată Invalidă";
