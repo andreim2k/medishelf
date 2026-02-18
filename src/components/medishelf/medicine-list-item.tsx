@@ -31,8 +31,10 @@ export function MedicineListItem({
       <TableCell>
         <div className="font-medium">{medicine.name}</div>
         {medicine.description && (
-          <div className="line-clamp-1 hidden text-sm text-muted-foreground sm:block">
-            {medicine.description}
+          <div className="hidden text-sm text-muted-foreground sm:block">
+            {medicine.description.length > 60
+              ? `${medicine.description.substring(0, 60)}...`
+              : medicine.description}
           </div>
         )}
         <div className="text-sm text-muted-foreground lg:hidden">

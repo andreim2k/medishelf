@@ -49,8 +49,10 @@ export function MedicineCard({
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         {medicine.description && (
-          <p className="line-clamp-3 text-sm text-muted-foreground">
-            {medicine.description}
+          <p className="text-sm text-muted-foreground">
+            {medicine.description.length > 100
+              ? `${medicine.description.substring(0, 100)}...`
+              : medicine.description}
           </p>
         )}
         <div className="flex items-center text-sm text-muted-foreground">
