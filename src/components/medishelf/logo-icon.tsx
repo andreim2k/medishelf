@@ -8,7 +8,7 @@ export function LogoIcon({ className }: { className?: string }) {
       viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn(className)}
+      className={cn("text-[hsl(var(--primary))]", className)}
     >
       <title>PillVentory Logo</title>
       
