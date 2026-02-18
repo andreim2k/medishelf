@@ -33,6 +33,33 @@ export function MedicineDetailsDialog({
     locale: ro,
   });
 
+  const renderDescription = (description?: string) => {
+    if (!description) return null;
+    return description.split('\n').filter(line => line.trim()).map((line, index) => {
+      const cleanedLine = line.trim().replace(/^-\s*/, '');
+      const boldRegex = /\*\*(.*?)\*\*/;
+      const match = cleanedLine.match(boldRegex);
+
+      if (match && match[1]) {
+        const title = match[1];
+        const content = cleanedLine.substring(match[0].length + (match.index || 0)).trim();
+        const cleanedContent = content.startsWith(':') ? content.substring(1).trim() : content;
+
+        if (!cleanedContent) return (
+            <h4 key={index} className="font-semibold text-foreground">{title}</h4>
+        );
+
+        return (
+          <div key={index}>
+            <h4 className="font-semibold text-foreground">{title}</h4>
+            <p className="text-muted-foreground">{cleanedContent}</p>
+          </div>
+        );
+      }
+      return <p key={index}>{cleanedLine}</p>;
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-2xl">
@@ -47,23 +74,8 @@ export function MedicineDetailsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
-          <div className="prose prose-sm dark:prose-invert max-w-none">
-            {medicine.description &&
-              medicine.description.split("\n").map((line, index) => {
-                if (!line.trim()) return null;
-                // Use a simple regex to find **bolded** text
-                const parts = line.split(/(\*\*.*?\*\*)/g);
-                return (
-                  <p key={index}>
-                    {parts.map((part, i) => {
-                      if (part.startsWith("**") && part.endsWith("**")) {
-                        return <strong key={i}>{part.slice(2, -2)}</strong>;
-                      }
-                      return part;
-                    })}
-                  </p>
-                );
-              })}
+          <div className="max-w-none text-sm space-y-3">
+            {renderDescription(medicine.description)}
           </div>
 
           <div className="mt-2 grid grid-cols-2 gap-4 text-sm">

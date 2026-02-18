@@ -23,6 +23,19 @@ export function MedicineListItem({
     locale: ro,
   });
 
+  const cleanDescription = medicine.description
+    ? medicine.description
+        .replace(/\*\*/g, "")
+        .replace(/^-\s*/gm, "")
+        .replace(/\n/g, " ")
+        .trim()
+    : "";
+
+  const truncatedDescription =
+    cleanDescription.length > 60
+      ? `${cleanDescription.substring(0, 60)}...`
+      : cleanDescription;
+
   return (
     <TableRow
       onClick={() => onViewDetails(medicine)}
@@ -32,9 +45,7 @@ export function MedicineListItem({
         <div className="font-medium">{medicine.name}</div>
         {medicine.description && (
           <div className="hidden text-sm text-muted-foreground sm:block">
-            {medicine.description.length > 60
-              ? `${medicine.description.substring(0, 60)}...`
-              : medicine.description}
+            {truncatedDescription}
           </div>
         )}
         <div className="text-sm text-muted-foreground lg:hidden">

@@ -33,6 +33,19 @@ export function MedicineCard({
     locale: ro,
   });
 
+  const cleanDescription = medicine.description
+    ? medicine.description
+        .replace(/\*\*/g, "")
+        .replace(/^-\s*/gm, "")
+        .replace(/\n/g, " ")
+        .trim()
+    : "";
+
+  const truncatedDescription =
+    cleanDescription.length > 100
+      ? `${cleanDescription.substring(0, 100)}...`
+      : cleanDescription;
+
   return (
     <Card
       className="flex h-full cursor-pointer flex-col overflow-hidden border bg-card/60 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-primary/20 dark:bg-card/20"
@@ -50,9 +63,7 @@ export function MedicineCard({
       <CardContent className="flex-grow space-y-4">
         {medicine.description && (
           <p className="text-sm text-muted-foreground">
-            {medicine.description.length > 100
-              ? `${medicine.description.substring(0, 100)}...`
-              : medicine.description}
+            {truncatedDescription}
           </p>
         )}
         <div className="flex items-center text-sm text-muted-foreground">
