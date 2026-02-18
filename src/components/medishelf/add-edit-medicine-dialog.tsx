@@ -41,6 +41,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Label } from "../ui/label";
 
 const medicineTypes = [
   "Pastilă",
@@ -65,7 +66,6 @@ const medicineTypes = [
 const medicineSchema = z.object({
   id: z.string(),
   name: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere."),
-  description: z.string().optional(),
   medicineType: z.enum(medicineTypes),
   quantity: z.coerce
     .number()
@@ -93,7 +93,6 @@ export function AddEditMedicineDialog({
     defaultValues: {
       id: "",
       name: "",
-      description: "",
       medicineType: "Pastilă",
       quantity: 1,
     },
@@ -104,7 +103,6 @@ export function AddEditMedicineDialog({
       if (medicineToEdit) {
         form.reset({
           ...medicineToEdit,
-          description: medicineToEdit.description || "",
           purchaseDate: new Date(medicineToEdit.purchaseDate),
           expiryDate: new Date(medicineToEdit.expiryDate),
         });
@@ -112,7 +110,6 @@ export function AddEditMedicineDialog({
         form.reset({
           id: crypto.randomUUID(),
           name: "",
-          description: "",
           medicineType: "Pastilă",
           quantity: 1,
           purchaseDate: new Date(),
@@ -121,6 +118,87 @@ export function AddEditMedicineDialog({
       }
     }
   }, [medicineToEdit, isOpen, form]);
+
+  const renderDescription = (description?: string) => {
+    if (!description) return null;
+
+    const sections: { title: string; content: string[] }[] = [];
+    let currentSection: { title: string; content: string[] } | null = null;
+
+    description.split("\n").forEach((line) => {
+      const cleanedLine = line.trim();
+      if (!cleanedLine) return;
+
+      const match = cleanedLine.match(/^\*\*(.*?)\*\*/);
+      if (match) {
+        if (currentSection) {
+          sections.push(currentSection);
+        }
+        const title = match[1].replace(/:$/, "").trim();
+        const restOfLine = cleanedLine
+          .substring(match[0].length)
+          .replace(/^:/, "")
+          .trim();
+        currentSection = { title, content: [] };
+        if (restOfLine) {
+          currentSection.content.push(restOfLine);
+        }
+      } else if (currentSection) {
+        currentSection.content.push(cleanedLine.replace(/^- /, ""));
+      }
+    });
+
+    if (currentSection) {
+      sections.push(currentSection);
+    }
+
+    return sections.map((section, index) => {
+      const isSideEffects = section.title
+        .toLowerCase()
+        .includes("efecte secundare");
+      let sideEffectsComment: string | null = null;
+      let listItems = section.content;
+
+      if (isSideEffects && listItems.length > 1) {
+        const lastLine = listItems[listItems.length - 1];
+        if (
+          lastLine.toLowerCase().startsWith("aceste") ||
+          lastLine.toLowerCase().startsWith("dacă")
+        ) {
+          sideEffectsComment = listItems.pop() || null;
+        }
+      }
+
+      return (
+        <div key={index}>
+          <h4 className="font-semibold text-foreground tracking-tight">
+            {section.title}
+          </h4>
+          <div className="mt-2 space-y-1">
+            {isSideEffects && listItems.length > 0 ? (
+              <>
+                {listItems.map((item, itemIndex) => (
+                  <div key={itemIndex} className="flex items-start">
+                    <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
+                    <span className="text-muted-foreground">{item}</span>
+                  </div>
+                ))}
+                {sideEffectsComment && (
+                  <p className="text-sm text-muted-foreground/80 pt-2">
+                    {sideEffectsComment}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                {section.content.join("\n")}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    });
+  };
 
   const onSubmit = (values: z.infer<typeof medicineSchema>) => {
     onSave({
@@ -147,7 +225,7 @@ export function AddEditMedicineDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-h-[80vh] space-y-4 overflow-y-auto px-2"
+            className="space-y-4 px-2"
           >
             <FormField
               control={form.control}
@@ -233,7 +311,7 @@ export function AddEditMedicineDialog({
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent
-                        className="w-auto p-0 z-[100]"
+                        className="w-auto p-0"
                         align="start"
                       >
                         <Calendar
@@ -276,7 +354,7 @@ export function AddEditMedicineDialog({
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent
-                        className="w-auto p-0 z-[100]"
+                        className="w-auto p-0"
                         align="start"
                       >
                         <Calendar
@@ -293,7 +371,14 @@ export function AddEditMedicineDialog({
                 )}
               />
             </div>
-
+            {medicineToEdit && medicineToEdit.description && (
+              <div className="space-y-2">
+                <Label>Descriere</Label>
+                <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
+                  {renderDescription(medicineToEdit.description)}
+                </div>
+              </div>
+            )}
             <DialogFooter className="pt-4">
               <Button
                 type="button"
