@@ -5,6 +5,7 @@ export type Medicine = {
   medicineType:
     | "Pastilă"
     | "Capsulă"
+    | "Plicuri"
     | "Lichid"
     | "Sirop"
     | "Picături"

@@ -47,6 +47,7 @@ import { cn } from "@/lib/utils";
 const medicineTypes = [
   "Pastilă",
   "Capsulă",
+  "Plicuri",
   "Lichid",
   "Sirop",
   "Picături",
