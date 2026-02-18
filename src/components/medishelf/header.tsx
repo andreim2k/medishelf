@@ -36,7 +36,7 @@ export function Header() {
               href="/"
               className="group flex items-center gap-3 text-lg font-semibold"
             >
-              <LogoIcon className="h-7 w-7" />
+              <LogoIcon className="h-7 w-7 flex-shrink-0" />
               <span className="font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
                 PillVentory
               </span>
@@ -66,7 +66,7 @@ export function Header() {
       </div>
       
       <Link href="/" className="flex items-center gap-2 sm:hidden">
-        <LogoIcon className="h-6 w-6" />
+        <LogoIcon className="h-7 w-7" />
         <div className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
           PillVentory
         </div>
