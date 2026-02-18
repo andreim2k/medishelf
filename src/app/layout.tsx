@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Sidebar } from "@/components/medishelf/sidebar";
+import { Header } from "@/components/medishelf/header";
 
 export const metadata: Metadata = {
   title: "MediShelf",
@@ -29,7 +31,15 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider>
-          <main>{children}</main>
+          <div className="flex min-h-screen w-full flex-col bg-muted/40">
+            <Sidebar />
+            <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+              <Header />
+              <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                {children}
+              </main>
+            </div>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>
