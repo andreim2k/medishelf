@@ -335,7 +335,6 @@ export function AddEditMedicineDialog({
                           disabled={(date) => date > new Date()}
                           initialFocus
                           locale={ro}
-                          formatters={{ formatWeekdayName }}
                         />
                       </PopoverContent>
                     </Popover>
@@ -379,7 +378,6 @@ export function AddEditMedicineDialog({
                           onSelect={field.onChange}
                           initialFocus
                           locale={ro}
-                          formatters={{ formatWeekdayName }}
                         />
                       </PopoverContent>
                     </Popover>
