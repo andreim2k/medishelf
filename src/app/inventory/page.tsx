@@ -10,6 +10,7 @@ import {
   List,
   ArrowUp,
   ArrowDown,
+  ArrowUpDown,
 } from "lucide-react";
 import type { Medicine } from "@/lib/types";
 import { initialMedicines } from "@/lib/data";
@@ -287,80 +288,115 @@ export default function InventoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort("name")}
-                        className="-ml-4"
+                    <TableHead
+                      onClick={() => handleSort("name")}
+                      className="cursor-pointer group hover:bg-accent/50 transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-2",
+                          sortColumn === "name" && "text-foreground"
+                        )}
                       >
                         Nume
-                        {sortColumn === "name" &&
-                          (sortDirection === "asc" ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
+                        {sortColumn === "name" ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp className="h-4 w-4" />
                           ) : (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                          ))}
-                      </Button>
+                            <ArrowDown className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        )}
+                      </div>
                     </TableHead>
-                    <TableHead className="hidden sm:table-cell">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort("status")}
-                        className="-ml-4"
+                    <TableHead
+                      onClick={() => handleSort("status")}
+                      className="hidden sm:table-cell cursor-pointer group hover:bg-accent/50 transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-2",
+                          sortColumn === "status" && "text-foreground"
+                        )}
                       >
                         Status
-                        {sortColumn === "status" &&
-                          (sortDirection === "asc" ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
+                        {sortColumn === "status" ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp className="h-4 w-4" />
                           ) : (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                          ))}
-                      </Button>
+                            <ArrowDown className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        )}
+                      </div>
                     </TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort("medicineType")}
-                        className="-ml-4"
+                    <TableHead
+                      onClick={() => handleSort("medicineType")}
+                      className="hidden md:table-cell cursor-pointer group hover:bg-accent/50 transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-2",
+                          sortColumn === "medicineType" && "text-foreground"
+                        )}
                       >
                         Tip
-                        {sortColumn === "medicineType" &&
-                          (sortDirection === "asc" ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
+                        {sortColumn === "medicineType" ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp className="h-4 w-4" />
                           ) : (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                          ))}
-                      </Button>
+                            <ArrowDown className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        )}
+                      </div>
                     </TableHead>
-                    <TableHead className="hidden sm:table-cell">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort("quantity")}
-                        className="-ml-4"
+                    <TableHead
+                      onClick={() => handleSort("quantity")}
+                      className="hidden sm:table-cell cursor-pointer group hover:bg-accent/50 transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-2",
+                          sortColumn === "quantity" && "text-foreground"
+                        )}
                       >
                         Cantitate
-                        {sortColumn === "quantity" &&
-                          (sortDirection === "asc" ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
+                        {sortColumn === "quantity" ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp className="h-4 w-4" />
                           ) : (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                          ))}
-                      </Button>
+                            <ArrowDown className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        )}
+                      </div>
                     </TableHead>
-                    <TableHead className="hidden lg:table-cell">
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleSort("expiryDate")}
-                        className="-ml-4"
+                    <TableHead
+                      onClick={() => handleSort("expiryDate")}
+                      className="hidden lg:table-cell cursor-pointer group hover:bg-accent/50 transition-colors"
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center gap-2",
+                          sortColumn === "expiryDate" && "text-foreground"
+                        )}
                       >
                         Expirare
-                        {sortColumn === "expiryDate" &&
-                          (sortDirection === "asc" ? (
-                            <ArrowUp className="ml-2 h-4 w-4" />
+                        {sortColumn === "expiryDate" ? (
+                          sortDirection === "asc" ? (
+                            <ArrowUp className="h-4 w-4" />
                           ) : (
-                            <ArrowDown className="ml-2 h-4 w-4" />
-                          ))}
-                      </Button>
+                            <ArrowDown className="h-4 w-4" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity" />
+                        )}
+                      </div>
                     </TableHead>
                     <TableHead className="text-right">Acțiuni</TableHead>
                   </TableRow>
