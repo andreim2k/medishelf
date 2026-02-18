@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, BarChart2, ShieldPlus } from "lucide-react";
+import { Home, Package, BarChart2 } from "lucide-react";
+import { LogoIcon } from "./logo-icon";
 
 import { cn } from "@/lib/utils";
 import {
@@ -28,7 +29,7 @@ export function Sidebar() {
           href="/"
           className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
         >
-          <ShieldPlus className="h-5 w-5 transition-all group-hover:scale-110" />
+          <LogoIcon className="h-5 w-5" />
           <span className="sr-only">MediShelf</span>
         </Link>
         <TooltipProvider>

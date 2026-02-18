@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, BarChart2, ShieldPlus, PanelLeft } from "lucide-react";
+import { Home, Package, BarChart2, PanelLeft } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { LogoIcon } from "./logo-icon";
 
 const navItems = [
   { href: "/", label: "Panou de control", icon: Home },
@@ -33,9 +34,11 @@ export function Header() {
           <nav className="grid gap-6 text-lg font-medium">
             <Link
               href="/"
-              className="flex items-center gap-2 text-lg font-semibold"
+              className="group flex items-center gap-3 text-lg font-semibold"
             >
-              <ShieldPlus className="h-6 w-6 text-primary" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                <LogoIcon className="h-5 w-5" />
+              </div>
               <span>MediShelf</span>
             </Link>
             {navItems.map((item) => (
