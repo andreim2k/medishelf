@@ -44,11 +44,30 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarIcon, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const medicineTypes = [
+  "Pastilă",
+  "Capsulă",
+  "Lichid",
+  "Sirop",
+  "Picături",
+  "Cremă",
+  "Unguent",
+  "Gel",
+  "Spray nazal",
+  "Spray oral",
+  "Inhalator",
+  "Injecție",
+  "Supozitor",
+  "Ovul",
+  "Plasture",
+  "Altul",
+] as const;
+
 const medicineSchema = z.object({
   id: z.string(),
   name: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere."),
   description: z.string().optional(),
-  medicineType: z.enum(["Pastilă", "Lichid", "Sirop", "Cremă", "Altul"]),
+  medicineType: z.enum(medicineTypes),
   quantity: z.coerce
     .number()
     .int()
@@ -324,7 +343,7 @@ export function AddEditMedicineDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {["Pastilă", "Lichid", "Sirop", "Cremă", "Altul"].map(
+                        {medicineTypes.map(
                           (type) => (
                             <SelectItem key={type} value={type}>
                               {type}
