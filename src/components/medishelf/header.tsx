@@ -36,10 +36,8 @@ export function Header() {
               href="/"
               className="group flex items-center gap-3 text-lg font-semibold"
             >
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <LogoIcon className="h-5 w-5" />
-              </div>
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text font-bold text-transparent">
+              <LogoIcon className="h-7 w-7" />
+              <span className="font-bold">
                 MediShelf
               </span>
             </Link>
@@ -62,14 +60,14 @@ export function Header() {
       
       <div className="hidden items-center gap-2 sm:flex">
         <LogoIcon className="h-7 w-7" />
-        <div className="bg-gradient-to-r from-primary to-accent bg-clip-text text-3xl font-bold text-transparent">
+        <div className="text-2xl font-bold">
           MediShelf
         </div>
       </div>
       
       <Link href="/" className="flex items-center gap-2 sm:hidden">
         <LogoIcon className="h-6 w-6" />
-        <div className="bg-gradient-to-r from-primary to-accent bg-clip-text text-xl font-bold text-transparent">
+        <div className="text-xl font-bold">
           MediShelf
         </div>
       </Link>
