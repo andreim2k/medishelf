@@ -21,6 +21,7 @@ const GenerateMedicineImageOutputSchema = z.object({
   imageDataUri: z
     .string()
     .describe('A URL for a relevant image of the medicine.'),
+  imageHint: z.string().describe('The search term used for the image.').optional(),
 });
 export type GenerateMedicineImageOutput = z.infer<
   typeof GenerateMedicineImageOutputSchema
@@ -64,11 +65,13 @@ const generateMedicineImageUrlFlow = ai.defineFlow(
   },
   async (input) => {
     let imageUrl: string;
+    let imageHint: string | undefined;
     try {
       const { output } = await generateSearchTermPrompt(input);
       if (output?.searchTerm) {
+        imageHint = output.searchTerm;
         imageUrl = `https://source.unsplash.com/400x300/?${encodeURIComponent(
-          output.searchTerm
+          imageHint
         )}`;
       } else {
         // Fallback to picsum if search term generation fails
@@ -87,6 +90,6 @@ const generateMedicineImageUrlFlow = ai.defineFlow(
       )}/400/300`;
     }
 
-    return { imageDataUri: imageUrl };
+    return { imageDataUri: imageUrl, imageHint };
   }
 );

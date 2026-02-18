@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,6 +9,7 @@ import { format } from "date-fns";
 import { ro } from "date-fns/locale";
 import type { Medicine } from "@/lib/types";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
+import { generateMedicineImage } from "@/ai/flows/generate-medicine-image";
 
 import {
   Dialog,
@@ -41,6 +43,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarIcon, Wand2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +58,8 @@ const medicineSchema = z.object({
     .positive("Cantitatea trebuie să fie un număr pozitiv."),
   purchaseDate: z.date({ required_error: "Data cumpărării este obligatorie." }),
   expiryDate: z.date({ required_error: "Data expirării este obligatorie." }),
+  imageUrl: z.string().url().optional().or(z.literal("")),
+  imageHint: z.string().optional(),
 });
 
 type AddEditMedicineDialogProps = {
@@ -73,43 +78,74 @@ export function AddEditMedicineDialog({
   const [isGenerating, setIsGenerating] = useState(false);
   const form = useForm<z.infer<typeof medicineSchema>>({
     resolver: zodResolver(medicineSchema),
+    defaultValues: {
+      id: "",
+      name: "",
+      description: "",
+      medicineType: "Pastilă",
+      quantity: 1,
+      imageUrl: "",
+      imageHint: "",
+    },
   });
 
   useEffect(() => {
-    if (medicineToEdit) {
-      form.reset({
-        ...medicineToEdit,
-        description: medicineToEdit.description || "",
-        purchaseDate: new Date(medicineToEdit.purchaseDate),
-        expiryDate: new Date(medicineToEdit.expiryDate),
-      });
-    } else {
-      form.reset({
-        id: crypto.randomUUID(),
-        name: "",
-        description: "",
-        medicineType: "Pastilă",
-        quantity: 1,
-        purchaseDate: new Date(),
-        expiryDate: undefined,
-      });
+    if (isOpen) {
+      if (medicineToEdit) {
+        form.reset({
+          ...medicineToEdit,
+          description: medicineToEdit.description || "",
+          purchaseDate: new Date(medicineToEdit.purchaseDate),
+          expiryDate: new Date(medicineToEdit.expiryDate),
+          imageUrl: medicineToEdit.imageUrl || "",
+          imageHint: medicineToEdit.imageHint || "",
+        });
+      } else {
+        form.reset({
+          id: crypto.randomUUID(),
+          name: "",
+          description: "",
+          medicineType: "Pastilă",
+          quantity: 1,
+          purchaseDate: new Date(),
+          expiryDate: undefined,
+          imageUrl: "",
+          imageHint: "",
+        });
+      }
     }
   }, [medicineToEdit, isOpen, form]);
 
-  const handleGenerateDescription = async () => {
+  const handleGenerate = async () => {
     const name = form.getValues("name");
     if (!name) {
-      form.setError("name", { message: "Vă rugăm introduceți mai întâi un nume." });
+      form.setError("name", {
+        message: "Vă rugăm introduceți mai întâi un nume.",
+      });
       return;
     }
     setIsGenerating(true);
     try {
-      const result = await generateMedicineDescription({ medicineName: name });
-      form.setValue("description", result.description, {
-        shouldValidate: true,
-      });
+      const [descResult, imageResult] = await Promise.all([
+        generateMedicineDescription({ medicineName: name }),
+        generateMedicineImage({ medicineName: name }),
+      ]);
+
+      if (descResult) {
+        form.setValue("description", descResult.description, {
+          shouldValidate: true,
+        });
+      }
+      if (imageResult) {
+        form.setValue("imageUrl", imageResult.imageDataUri, {
+          shouldValidate: true,
+        });
+        form.setValue("imageHint", imageResult.imageHint, {
+          shouldValidate: true,
+        });
+      }
     } catch (error) {
-      console.error("Failed to generate description", error);
+      console.error("Failed to generate details", error);
       // TODO: Show a toast notification to the user
     } finally {
       setIsGenerating(false);
@@ -125,9 +161,12 @@ export function AddEditMedicineDialog({
     setIsOpen(false);
   };
 
+  const imageUrl = form.watch("imageUrl");
+  const imageHint = form.watch("imageHint");
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
             {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
@@ -139,7 +178,10 @@ export function AddEditMedicineDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="max-h-[80vh] overflow-y-auto space-y-4 pr-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -153,36 +195,55 @@ export function AddEditMedicineDialog({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Descriere</FormLabel>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleGenerateDescription}
-                      disabled={isGenerating || !form.watch("name")}
-                    >
-                      <Wand2 className="mr-2 h-4 w-4" />
-                      {isGenerating ? "Se generează..." : "Generează"}
-                    </Button>
-                  </div>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Descrierea generată de AI va apărea aici, incluzând utilizare, substanță activă și efecte secundare."
-                      {...field}
-                      value={field.value ?? ""}
-                      rows={8}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <FormLabel>Detalii generate de AI</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !form.watch("name")}
+                >
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  {isGenerating ? "Se generează..." : "Generează"}
+                </Button>
+              </div>
+
+              {isGenerating && !imageUrl ? (
+                <Skeleton className="h-48 w-full rounded-lg" />
+              ) : imageUrl ? (
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                  <Image
+                    src={imageUrl}
+                    alt={form.getValues("name")}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={imageHint || "medicine"}
+                  />
+                </div>
+              ) : null}
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descrierea, utilizarea, substanța activă și efectele secundare vor apărea aici."
+                        {...field}
+                        value={field.value ?? ""}
+                        rows={8}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -206,6 +267,7 @@ export function AddEditMedicineDialog({
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -308,7 +370,7 @@ export function AddEditMedicineDialog({
                 )}
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="pt-4">
               <Button type="submit">Salvează</Button>
             </DialogFooter>
           </form>
