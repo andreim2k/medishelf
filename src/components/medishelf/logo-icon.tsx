@@ -13,12 +13,12 @@ export function LogoIcon({ className }: { className?: string }) {
       <title>MediShelf Logo</title>
       <defs>
         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: "hsl(var(--primary))" }} />
-          <stop offset="100%" style={{ stopColor: "hsl(var(--accent))" }} />
+          <stop offset="0%" style={{ stopColor: "#0ea5e9" }} />
+          <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
         </linearGradient>
         <linearGradient id="cross-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: "hsl(var(--primary))" }} />
-          <stop offset="100%" style={{ stopColor: "hsl(var(--accent))" }} />
+          <stop offset="0%" style={{ stopColor: "#0ea5e9" }} />
+          <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
         </linearGradient>
       </defs>
       <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#logo-gradient)" strokeWidth="1.5" fill="none"/>

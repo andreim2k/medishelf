@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import type { Medicine } from "@/lib/types";
 import {
   Dialog,
@@ -13,6 +14,8 @@ import { Calendar, Package, Pill } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import { StatusBadge } from "./status-badge";
+import { generateMedicineImage } from "@/ai/flows/generate-medicine-image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type MedicineDetailsDialogProps = {
   isOpen: boolean;
@@ -20,11 +23,49 @@ type MedicineDetailsDialogProps = {
   medicine?: Medicine;
 };
 
+// Component-level cache for generated images
+const generatedImageCache: Record<string, string> = {};
+
 export function MedicineDetailsDialog({
   isOpen,
   setIsOpen,
   medicine,
 }: MedicineDetailsDialogProps) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && medicine) {
+      // Prioritize existing image URL
+      if (medicine.imageUrl) {
+        setImageUrl(medicine.imageUrl);
+        return;
+      }
+      // Check cache
+      if (generatedImageCache[medicine.id]) {
+        setImageUrl(generatedImageCache[medicine.id]);
+        return;
+      }
+      // Generate new image
+      const generate = async () => {
+        setIsGenerating(true);
+        try {
+          const result = await generateMedicineImage({
+            medicineName: medicine.name,
+          });
+          generatedImageCache[medicine.id] = result.imageDataUri;
+          setImageUrl(result.imageDataUri);
+        } catch (error) {
+          console.error("Failed to generate medicine image:", error);
+          setImageUrl(null); // or a fallback error image
+        } finally {
+          setIsGenerating(false);
+        }
+      };
+      generate();
+    }
+  }, [isOpen, medicine]);
+
   if (!medicine) return null;
 
   const purchaseDate = format(parseISO(medicine.purchaseDate), "d MMMM yyyy", {
@@ -48,17 +89,19 @@ export function MedicineDetailsDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
-          {medicine.imageUrl && (
+          {isGenerating ? (
+            <Skeleton className="aspect-video w-full rounded-lg" />
+          ) : imageUrl ? (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg">
               <Image
-                src={medicine.imageUrl}
+                src={imageUrl}
                 alt={medicine.name}
                 fill
                 className="object-cover"
                 data-ai-hint={medicine.imageHint || "medicine"}
               />
             </div>
-          )}
+          ) : null}
 
           <div className="prose prose-sm dark:prose-invert max-w-none">
             {medicine.description && <p>{medicine.description}</p>}
