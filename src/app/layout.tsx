@@ -6,8 +6,8 @@ import { Sidebar } from "@/components/medishelf/sidebar";
 import { Header } from "@/components/medishelf/header";
 
 export const metadata: Metadata = {
-  title: "MediShelf",
-  description: "Gestionați-vă inventarul de medicamente cu ușurință.",
+  title: "FluxCore",
+  description: "Sistem inteligent de management al inventarului medical.",
 };
 
 export default function RootLayout({

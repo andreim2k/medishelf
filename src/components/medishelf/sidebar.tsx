@@ -30,7 +30,7 @@ export function Sidebar() {
           className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
         >
           <LogoIcon className="h-6 w-6" />
-          <span className="sr-only">MediShelf</span>
+          <span className="sr-only">FluxCore</span>
         </Link>
         <TooltipProvider>
           {navItems.map((item) => (
