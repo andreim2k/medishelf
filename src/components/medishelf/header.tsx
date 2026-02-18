@@ -59,10 +59,22 @@ export function Header() {
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="hidden bg-gradient-to-r from-primary to-accent bg-clip-text text-3xl font-bold text-transparent sm:block">
-        MediShelf
+      
+      <div className="hidden items-center gap-2 sm:flex">
+        <LogoIcon className="h-7 w-7" />
+        <div className="bg-gradient-to-r from-primary to-accent bg-clip-text text-3xl font-bold text-transparent">
+          MediShelf
+        </div>
       </div>
-      <div className="flex w-full items-center justify-end">
+      
+      <Link href="/" className="flex items-center gap-2 sm:hidden">
+        <LogoIcon className="h-6 w-6" />
+        <div className="bg-gradient-to-r from-primary to-accent bg-clip-text text-xl font-bold text-transparent">
+          MediShelf
+        </div>
+      </Link>
+
+      <div className="flex flex-1 items-center justify-end">
         <ThemeToggle />
       </div>
     </header>
