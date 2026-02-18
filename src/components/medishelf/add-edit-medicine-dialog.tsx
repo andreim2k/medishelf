@@ -143,7 +143,7 @@ export function AddEditMedicineDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md overflow-visible">
         <DialogHeader>
           <DialogTitle>
             {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
@@ -157,7 +157,7 @@ export function AddEditMedicineDialog({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-h-[80vh] overflow-y-auto space-y-4 pr-4"
+            className="max-h-[80vh] space-y-4 px-2 overflow-visible"
           >
             <FormField
               control={form.control}

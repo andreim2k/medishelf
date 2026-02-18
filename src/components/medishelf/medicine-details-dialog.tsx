@@ -35,7 +35,7 @@ export function MedicineDetailsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <div className="flex items-center gap-4">
             <DialogTitle className="text-2xl">{medicine.name}</DialogTitle>
