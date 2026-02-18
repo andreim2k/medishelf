@@ -82,6 +82,10 @@ type AddEditMedicineDialogProps = {
   medicineToEdit?: Medicine;
 };
 
+const formatWeekdayName = (day: Date) => {
+  return format(day, 'EEEEEE', { locale: ro });
+};
+
 export function AddEditMedicineDialog({
   isOpen,
   setIsOpen,
@@ -321,6 +325,7 @@ export function AddEditMedicineDialog({
                           disabled={(date) => date > new Date()}
                           initialFocus
                           locale={ro}
+                          formatters={{ formatWeekdayName }}
                         />
                       </PopoverContent>
                     </Popover>
@@ -363,6 +368,7 @@ export function AddEditMedicineDialog({
                           onSelect={field.onChange}
                           initialFocus
                           locale={ro}
+                          formatters={{ formatWeekdayName }}
                         />
                       </PopoverContent>
                     </Popover>

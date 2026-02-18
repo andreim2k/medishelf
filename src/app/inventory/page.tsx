@@ -105,7 +105,18 @@ export default function InventoryPage() {
   const handleSaveMedicine = async (medicine: Medicine) => {
     if (medicineToEdit) {
       setMedicines(
-        medicines.map((m) => (m.id === medicine.id ? { ...m, ...medicine } : m))
+        medicines.map((m) =>
+          m.id === medicine.id
+            ? {
+                ...m,
+                name: medicine.name,
+                medicineType: medicine.medicineType,
+                quantity: medicine.quantity,
+                purchaseDate: medicine.purchaseDate,
+                expiryDate: medicine.expiryDate,
+              }
+            : m
+        )
       );
     } else {
       try {
