@@ -7,7 +7,7 @@
  * - GenerateMedicineDescriptionOutput - The return type for the generateMedicineDescription function.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai, devstralModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateMedicineDescriptionInputSchema = z.object({
@@ -18,7 +18,12 @@ export type GenerateMedicineDescriptionInput = z.infer<
 >;
 
 const GenerateMedicineDescriptionOutputSchema = z.object({
-  description: z.string().describe('A short description of the medicine.'),
+  descriptionEn: z
+    .string()
+    .describe('A short, one-sentence description of the medicine in English.'),
+  descriptionRo: z
+    .string()
+    .describe('A short, one-sentence description of the medicine in Romanian.'),
 });
 export type GenerateMedicineDescriptionOutput = z.infer<
   typeof GenerateMedicineDescriptionOutputSchema
@@ -32,9 +37,10 @@ export async function generateMedicineDescription(
 
 const prompt = ai.definePrompt({
   name: 'generateMedicineDescriptionPrompt',
+  model: devstralModel,
   input: { schema: GenerateMedicineDescriptionInputSchema },
   output: { schema: GenerateMedicineDescriptionOutputSchema },
-  prompt: `You are a medical expert. Generate a short, one-sentence description for the following medicine: {{{medicineName}}}.`,
+  prompt: `You are a medical expert. Generate a short, one-sentence description for the following medicine: {{{medicineName}}}. Provide the description in both English and Romanian.`,
 });
 
 const generateMedicineDescriptionFlow = ai.defineFlow(

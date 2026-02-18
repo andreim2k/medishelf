@@ -104,7 +104,10 @@ export function AddEditMedicineDialog({
     setIsGenerating(true);
     try {
       const result = await generateMedicineDescription({ medicineName: name });
-      form.setValue("description", result.description, { shouldValidate: true });
+      const bilingualDescription = `EN: ${result.descriptionEn}\n\nRO: ${result.descriptionRo}`;
+      form.setValue("description", bilingualDescription, {
+        shouldValidate: true,
+      });
     } catch (error) {
       console.error("Failed to generate description", error);
       // TODO: Show a toast notification to the user
@@ -150,7 +153,7 @@ export function AddEditMedicineDialog({
                 </FormItem>
               )}
             />
-             <FormField
+            <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -173,7 +176,7 @@ export function AddEditMedicineDialog({
                       placeholder="e.g. Used for treating pain and fever."
                       {...field}
                       value={field.value ?? ""}
-                      rows={3}
+                      rows={4}
                     />
                   </FormControl>
                   <FormMessage />
@@ -200,7 +203,10 @@ export function AddEditMedicineDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
