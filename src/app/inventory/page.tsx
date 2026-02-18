@@ -2,7 +2,15 @@
 
 import { useState, useMemo } from "react";
 import type { ChangeEvent } from "react";
-import { Plus, Search, Filter, LayoutGrid, List } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Filter,
+  LayoutGrid,
+  List,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import type { Medicine } from "@/lib/types";
 import { initialMedicines } from "@/lib/data";
 import { AddEditMedicineDialog } from "@/components/medishelf/add-edit-medicine-dialog";
@@ -37,6 +45,13 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+type SortableColumn =
+  | "name"
+  | "status"
+  | "medicineType"
+  | "quantity"
+  | "expiryDate";
+
 export default function InventoryPage() {
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,6 +64,8 @@ export default function InventoryPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"card" | "list">("list");
+  const [sortColumn, setSortColumn] = useState<SortableColumn>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const handleAddClick = () => {
     setMedicineToEdit(undefined);
@@ -83,7 +100,28 @@ export default function InventoryPage() {
     }
   };
 
-  const filteredMedicines = useMemo(() => {
+  const handleSort = (column: SortableColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  const filteredAndSortedMedicines = useMemo(() => {
+    const getStatusSortValue = (expiryDate: string) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiry = new Date(expiryDate);
+      const diffDays = Math.ceil(
+        (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (diffDays < 0) return 0; // Expirat
+      if (diffDays <= 30) return 1; // Expiră în curând
+      return 2; // Valabil
+    };
+
     return medicines
       .filter((med) => {
         const lowerCaseQuery = searchQuery.toLowerCase();
@@ -110,8 +148,43 @@ export default function InventoryPage() {
           return diffDays >= 0 && diffDays <= 30;
         if (statusFilter === "safe") return diffDays > 30;
         return true;
+      })
+      .sort((a, b) => {
+        if (sortColumn === "status") {
+          const aValue = getStatusSortValue(a.expiryDate);
+          const bValue = getStatusSortValue(b.expiryDate);
+          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        if (sortColumn === "expiryDate") {
+          const aValue = new Date(a.expiryDate).getTime();
+          const bValue = new Date(b.expiryDate).getTime();
+          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        if (sortColumn === "quantity") {
+          const aValue = a.quantity;
+          const bValue = b.quantity;
+          return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        // name or medicineType
+        const aValue = a[sortColumn] as string;
+        const bValue = b[sortColumn] as string;
+
+        if (sortDirection === "asc") {
+          return aValue.localeCompare(bValue, "ro");
+        }
+        return bValue.localeCompare(aValue, "ro");
       });
-  }, [medicines, searchQuery, statusFilter, typeFilter]);
+  }, [
+    medicines,
+    searchQuery,
+    statusFilter,
+    typeFilter,
+    sortColumn,
+    sortDirection,
+  ]);
 
   const medicineTypes = useMemo(() => {
     const types = new Set(medicines.map((m) => m.medicineType));
@@ -196,11 +269,11 @@ export default function InventoryPage() {
         </Select>
       </div>
 
-      {filteredMedicines.length > 0 ? (
+      {filteredAndSortedMedicines.length > 0 ? (
         <div>
           {viewMode === "card" ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredMedicines.map((medicine) => (
+              {filteredAndSortedMedicines.map((medicine) => (
                 <MedicineCard
                   key={medicine.id}
                   medicine={medicine}
@@ -214,24 +287,86 @@ export default function InventoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Nume</TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort("name")}
+                        className="-ml-4"
+                      >
+                        Nume
+                        {sortColumn === "name" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUp className="ml-2 h-4 w-4" />
+                          ) : (
+                            <ArrowDown className="ml-2 h-4 w-4" />
+                          ))}
+                      </Button>
+                    </TableHead>
                     <TableHead className="hidden sm:table-cell">
-                      Status
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort("status")}
+                        className="-ml-4"
+                      >
+                        Status
+                        {sortColumn === "status" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUp className="ml-2 h-4 w-4" />
+                          ) : (
+                            <ArrowDown className="ml-2 h-4 w-4" />
+                          ))}
+                      </Button>
                     </TableHead>
                     <TableHead className="hidden md:table-cell">
-                      Tip
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort("medicineType")}
+                        className="-ml-4"
+                      >
+                        Tip
+                        {sortColumn === "medicineType" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUp className="ml-2 h-4 w-4" />
+                          ) : (
+                            <ArrowDown className="ml-2 h-4 w-4" />
+                          ))}
+                      </Button>
                     </TableHead>
                     <TableHead className="hidden sm:table-cell">
-                      Cantitate
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort("quantity")}
+                        className="-ml-4"
+                      >
+                        Cantitate
+                        {sortColumn === "quantity" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUp className="ml-2 h-4 w-4" />
+                          ) : (
+                            <ArrowDown className="ml-2 h-4 w-4" />
+                          ))}
+                      </Button>
                     </TableHead>
                     <TableHead className="hidden lg:table-cell">
-                      Expirare
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort("expiryDate")}
+                        className="-ml-4"
+                      >
+                        Expirare
+                        {sortColumn === "expiryDate" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUp className="ml-2 h-4 w-4" />
+                          ) : (
+                            <ArrowDown className="ml-2 h-4 w-4" />
+                          ))}
+                      </Button>
                     </TableHead>
                     <TableHead className="text-right">Acțiuni</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredMedicines.map((medicine) => (
+                  {filteredAndSortedMedicines.map((medicine) => (
                     <MedicineListItem
                       key={medicine.id}
                       medicine={medicine}
@@ -251,7 +386,8 @@ export default function InventoryPage() {
           </div>
           <h2 className="text-xl font-semibold">Nu s-au găsit medicamente</h2>
           <p className="text-muted-foreground">
-            Încercați să ajustați căutarea sau filtrele, sau adăugați un medicament nou.
+            Încercați să ajustați căutarea sau filtrele, sau adăugați un
+            medicament nou.
           </p>
         </div>
       )}
@@ -268,7 +404,8 @@ export default function InventoryPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sunteți sigur?</AlertDialogTitle>
             <AlertDialogDescription>
-              Această acțiune nu poate fi anulată. Acest lucru va șterge permanent medicamentul din inventarul dvs.
+              Această acțiune nu poate fi anulată. Acest lucru va șterge
+              permanent medicamentul din inventarul dvs.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
