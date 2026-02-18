@@ -205,17 +205,26 @@ export function AddEditMedicineDialog({
   };
 
   const onSubmit = (values: z.infer<typeof medicineSchema>) => {
-    onSave({
+    const valuesToSave = {
       ...values,
       purchaseDate: format(values.purchaseDate, "yyyy-MM-dd"),
       expiryDate: format(values.expiryDate, "yyyy-MM-dd"),
-    });
+    };
+    
+    if (medicineToEdit) {
+      onSave({
+        ...medicineToEdit,
+        ...valuesToSave,
+      });
+    } else {
+      onSave(valuesToSave);
+    }
     setIsOpen(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
@@ -299,6 +308,7 @@ export function AddEditMedicineDialog({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant={"outline"}
                             className={cn(
                               "pl-3 text-left font-normal",
@@ -343,6 +353,7 @@ export function AddEditMedicineDialog({
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
+                            type="button"
                             variant={"outline"}
                             className={cn(
                               "pl-3 text-left font-normal",

@@ -106,16 +106,7 @@ export default function InventoryPage() {
     if (medicineToEdit) {
       setMedicines(
         medicines.map((m) =>
-          m.id === medicine.id
-            ? {
-                ...m,
-                name: medicine.name,
-                medicineType: medicine.medicineType,
-                quantity: medicine.quantity,
-                purchaseDate: medicine.purchaseDate,
-                expiryDate: medicine.expiryDate,
-              }
-            : m
+          m.id === medicine.id ? { ...m, ...medicine } : m
         )
       );
     } else {
