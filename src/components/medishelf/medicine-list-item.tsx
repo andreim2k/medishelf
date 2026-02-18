@@ -10,19 +10,24 @@ type MedicineListItemProps = {
   medicine: Medicine;
   onEdit: (medicine: Medicine) => void;
   onDelete: (id: string) => void;
+  onViewDetails: (medicine: Medicine) => void;
 };
 
 export function MedicineListItem({
   medicine,
   onEdit,
   onDelete,
+  onViewDetails,
 }: MedicineListItemProps) {
   const expiryDate = format(parseISO(medicine.expiryDate), "d MMM yyyy", {
     locale: ro,
   });
 
   return (
-    <TableRow>
+    <TableRow
+      onClick={() => onViewDetails(medicine)}
+      className="cursor-pointer"
+    >
       <TableCell>
         <div className="font-medium">{medicine.name}</div>
         {medicine.description && (
@@ -44,7 +49,7 @@ export function MedicineListItem({
         {medicine.quantity}
       </TableCell>
       <TableCell className="hidden lg:table-cell">{expiryDate}</TableCell>
-      <TableCell className="text-right">
+      <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
         <Button variant="ghost" size="icon" onClick={() => onEdit(medicine)}>
           <Pencil className="h-4 w-4" />
           <span className="sr-only">Editează</span>

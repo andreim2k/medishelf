@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
 
 type SortableColumn =
   | "name"
@@ -57,6 +58,10 @@ export default function InventoryPage() {
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [medicineToView, setMedicineToView] = useState<Medicine | undefined>(
+    undefined
+  );
   const [medicineToEdit, setMedicineToEdit] = useState<Medicine | undefined>(
     undefined
   );
@@ -81,6 +86,11 @@ export default function InventoryPage() {
   const handleDeleteClick = (id: string) => {
     setMedicineToDelete(id);
     setIsAlertOpen(true);
+  };
+  
+  const handleViewDetails = (medicine: Medicine) => {
+    setMedicineToView(medicine);
+    setIsDetailsOpen(true);
   };
 
   const confirmDelete = () => {
@@ -280,6 +290,7 @@ export default function InventoryPage() {
                   medicine={medicine}
                   onEdit={handleEditClick}
                   onDelete={handleDeleteClick}
+                  onViewDetails={handleViewDetails}
                 />
               ))}
             </div>
@@ -418,6 +429,7 @@ export default function InventoryPage() {
                       medicine={medicine}
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}
+                      onViewDetails={handleViewDetails}
                     />
                   ))}
                 </TableBody>
@@ -462,6 +474,12 @@ export default function InventoryPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <MedicineDetailsDialog
+        isOpen={isDetailsOpen}
+        setIsOpen={setIsDetailsOpen}
+        medicine={medicineToView}
+      />
     </>
   );
 }

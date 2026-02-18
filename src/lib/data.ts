@@ -9,6 +9,8 @@ export const initialMedicines: Medicine[] = [
     quantity: 50,
     purchaseDate: "2023-10-01",
     expiryDate: "2025-09-30",
+    imageUrl: "https://picsum.photos/seed/paracetamol/400/300",
+    imageHint: "white pills",
   },
   {
     id: "2",
@@ -18,6 +20,8 @@ export const initialMedicines: Medicine[] = [
     quantity: 24,
     purchaseDate: "2024-01-15",
     expiryDate: "2024-08-15",
+    imageUrl: "https://picsum.photos/seed/ibuprofen/400/300",
+    imageHint: "orange pills",
   },
   {
     id: "3",
@@ -27,6 +31,8 @@ export const initialMedicines: Medicine[] = [
     quantity: 1,
     purchaseDate: "2023-11-20",
     expiryDate: "2024-05-30",
+    imageUrl: "https://picsum.photos/seed/coughsyrup/400/300",
+    imageHint: "syrup bottle",
   },
   {
     id: "4",
@@ -45,6 +51,8 @@ export const initialMedicines: Medicine[] = [
     quantity: 1,
     purchaseDate: "2023-05-10",
     expiryDate: "2025-05-10",
+    imageUrl: "https://picsum.photos/seed/antiseptic/400/300",
+    imageHint: "cream tube",
   },
   {
     id: "6",
