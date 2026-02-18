@@ -36,9 +36,9 @@ export function Header() {
               href="/"
               className="group flex items-center gap-3 text-lg font-semibold"
             >
-              <LogoIcon className="h-8 w-8" />
-              <span className="font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-                FluxCore
+              <LogoIcon className="h-7 w-7" />
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                Pillventory
               </span>
             </Link>
             {navItems.map((item) => (
@@ -59,16 +59,16 @@ export function Header() {
       </Sheet>
       
       <div className="hidden items-center gap-2 sm:flex">
-        <LogoIcon className="h-8 w-8" />
-        <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-          FluxCore
+        <LogoIcon className="h-7 w-7" />
+        <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+          Pillventory
         </div>
       </div>
       
       <Link href="/" className="flex items-center gap-2 sm:hidden">
-        <LogoIcon className="h-7 w-7" />
-        <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-          FluxCore
+        <LogoIcon className="h-6 w-6" />
+        <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+          Pillventory
         </div>
       </Link>
 

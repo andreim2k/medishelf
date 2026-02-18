@@ -3,89 +3,101 @@ import { cn } from "@/lib/utils";
 export function LogoIcon({ className }: { className?: string }) {
   return (
     <svg
-      width="32"
-      height="32"
-      viewBox="0 0 32 32"
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={cn(className)}
     >
-      <title>FluxCore Logo</title>
+      <title>Pillventory Logo</title>
       <defs>
-        <linearGradient id="flux-gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: "#06b6d4" }} />
-          <stop offset="50%" style={{ stopColor: "#3b82f6" }} />
-          <stop offset="100%" style={{ stopColor: "#8b5cf6" }} />
+        <linearGradient id="pill-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#10b981" }} />
+          <stop offset="100%" style={{ stopColor: "#059669" }} />
         </linearGradient>
-        <linearGradient id="flux-gradient-2" x1="100%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id="pill-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style={{ stopColor: "#f59e0b" }} />
-          <stop offset="100%" style={{ stopColor: "#ec4899" }} />
+          <stop offset="100%" style={{ stopColor: "#d97706" }} />
         </linearGradient>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
+        <linearGradient id="pill-grad-3" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#3b82f6" }} />
+          <stop offset="100%" style={{ stopColor: "#2563eb" }} />
+        </linearGradient>
       </defs>
       
-      {/* Outer hexagon ring */}
-      <path
-        d="M16 2L28 9V23L16 30L4 23V9L16 2Z"
-        stroke="url(#flux-gradient-1)"
-        strokeWidth="1.5"
-        fill="none"
-        filter="url(#glow)"
+      {/* Three pills arranged in a triangular formation */}
+      {/* Top pill - capsule */}
+      <rect
+        x="10"
+        y="2"
+        width="8"
+        height="14"
+        rx="4"
+        fill="url(#pill-grad-1)"
+        transform="rotate(15 14 9)"
+      />
+      <rect
+        x="10"
+        y="2"
+        width="4"
+        height="14"
+        rx="4"
+        fill="#047857"
+        transform="rotate(15 14 9)"
+        opacity="0.3"
       />
       
-      {/* Inner core - abstract cross/plus shape */}
-      <path
-        d="M16 8V24"
-        stroke="url(#flux-gradient-1)"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        filter="url(#glow)"
-      />
-      <path
-        d="M8 16H24"
-        stroke="url(#flux-gradient-1)"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        filter="url(#glow)"
-      />
-      
-      {/* Center dot */}
+      {/* Bottom left pill - round tablet */}
       <circle
-        cx="16"
-        cy="16"
-        r="3"
-        fill="url(#flux-gradient-2)"
-        filter="url(#glow)"
+        cx="7"
+        cy="19"
+        r="5"
+        fill="url(#pill-grad-2)"
+      />
+      <circle
+        cx="7"
+        cy="19"
+        r="2"
+        fill="#fff"
+        opacity="0.4"
       />
       
-      {/* Orbital rings */}
-      <ellipse
-        cx="16"
-        cy="16"
-        rx="10"
-        ry="4"
-        fill="none"
-        stroke="url(#flux-gradient-2)"
-        strokeWidth="0.5"
-        opacity="0.4"
-        transform="rotate(45 16 16)"
+      {/* Bottom right pill - capsule horizontal */}
+      <rect
+        x="16"
+        y="15"
+        width="14"
+        height="7"
+        rx="3.5"
+        fill="url(#pill-grad-3)"
+        transform="rotate(-10 23 18.5)"
       />
-      <ellipse
-        cx="16"
-        cy="16"
-        rx="10"
-        ry="4"
-        fill="none"
-        stroke="url(#flux-gradient-2)"
-        strokeWidth="0.5"
+      <line
+        x1="23"
+        y1="15"
+        x2="23"
+        y2="22"
+        stroke="#1d4ed8"
+        strokeWidth="1"
+        transform="rotate(-10 23 18.5)"
         opacity="0.4"
-        transform="rotate(-45 16 16)"
+      />
+      
+      {/* Connection lines between pills - subtle organization */}
+      <path
+        d="M12 12L9 17"
+        stroke="#6b7280"
+        strokeWidth="1"
+        strokeDasharray="2 2"
+        opacity="0.3"
+      />
+      <path
+        d="M16 12L21 17"
+        stroke="#6b7280"
+        strokeWidth="1"
+        strokeDasharray="2 2"
+        opacity="0.3"
       />
     </svg>
   );
