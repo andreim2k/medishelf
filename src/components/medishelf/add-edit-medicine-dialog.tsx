@@ -175,7 +175,7 @@ export function AddEditMedicineDialog({
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <FormLabel>Descriere generată de AI</FormLabel>
+                <FormLabel>Descriere</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
