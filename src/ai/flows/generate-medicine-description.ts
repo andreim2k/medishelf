@@ -20,7 +20,7 @@ export type GenerateMedicineDescriptionInput = z.infer<
 const GenerateMedicineDescriptionOutputSchema = z.object({
   description: z
     .string()
-    .describe('A short, one-sentence description of the medicine in Romanian.'),
+    .describe('A detailed, well-formatted description of the medicine in Romanian, including usage, active substance, and common side effects.'),
 });
 export type GenerateMedicineDescriptionOutput = z.infer<
   typeof GenerateMedicineDescriptionOutputSchema
@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   model: devstralModel,
   input: { schema: GenerateMedicineDescriptionInputSchema },
   output: { schema: GenerateMedicineDescriptionOutputSchema },
-  prompt: `Ești un expert medical. Generează o descriere scurtă, de o singură propoziție, pentru următorul medicament: {{{medicineName}}}. Furnizează descrierea în limba română.`,
+  prompt: `Ești un expert medical. Generează o descriere detaliată și bine formatată pentru următorul medicament: {{{medicineName}}}. Descrierea trebuie să fie în limba română și să includă următoarele secțiuni, fiecare pe un rând nou și cu un titlu boldat (ex: **Utilizare:**): \n- **Utilizare:** Pentru ce este folosit medicamentul. \n- **Substanță activă:** Care este principala substanță activă. \n- **Efecte secundare comune:** O listă scurtă cu cele mai comune efecte secundare. \n\nAsigură-te că textul este clar, concis și ușor de înțeles pentru un non-specialist.`,
 });
 
 const generateMedicineDescriptionFlow = ai.defineFlow(

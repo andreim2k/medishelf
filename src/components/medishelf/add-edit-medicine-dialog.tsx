@@ -173,10 +173,10 @@ export function AddEditMedicineDialog({
                   </div>
                   <FormControl>
                     <Textarea
-                      placeholder="ex: RO: Utilizat pentru a trata durerea și a reduce febra. EN: Used to treat pain and reduce fever."
+                      placeholder="Descrierea generată de AI va apărea aici, incluzând utilizare, substanță activă și efecte secundare."
                       {...field}
                       value={field.value ?? ""}
-                      rows={4}
+                      rows={8}
                     />
                   </FormControl>
                   <FormMessage />
