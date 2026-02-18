@@ -85,9 +85,14 @@ export default function InventoryPage() {
 
   const filteredMedicines = useMemo(() => {
     return medicines
-      .filter((med) =>
-        med.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      .filter((med) => {
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        return (
+          med.name.toLowerCase().includes(lowerCaseQuery) ||
+          (med.description &&
+            med.description.toLowerCase().includes(lowerCaseQuery))
+        );
+      })
       .filter((med) => {
         if (typeFilter === "all") return true;
         return med.medicineType === typeFilter;
@@ -157,7 +162,7 @@ export default function InventoryPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search by name..."
+            placeholder="Search by name or description..."
             className="pl-10"
             value={searchQuery}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
