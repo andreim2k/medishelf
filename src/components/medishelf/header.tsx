@@ -33,10 +33,10 @@ export function Header() {
           <nav className="grid gap-6 text-lg font-medium">
             <Link
               href="/"
-              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+              className="flex items-center gap-2 text-lg font-semibold"
             >
-              <ShieldPlus className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">MediShelf</span>
+              <ShieldPlus className="h-6 w-6 text-primary" />
+              <span>MediShelf</span>
             </Link>
             {navItems.map((item) => (
               <Link
@@ -54,8 +54,9 @@ export function Header() {
           </nav>
         </SheetContent>
       </Sheet>
+      <div className="hidden text-xl font-semibold sm:block">MediShelf</div>
       <div className="flex w-full items-center justify-end">
-         <ThemeToggle />
+        <ThemeToggle />
       </div>
     </header>
   );

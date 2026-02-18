@@ -295,7 +295,9 @@ export default function InventoryPage() {
                       <div
                         className={cn(
                           "flex items-center gap-2",
-                          sortColumn === "name" && "text-foreground"
+                          sortColumn === "name"
+                            ? "font-semibold text-foreground"
+                            : ""
                         )}
                       >
                         Nume
@@ -317,7 +319,9 @@ export default function InventoryPage() {
                       <div
                         className={cn(
                           "flex items-center gap-2",
-                          sortColumn === "status" && "text-foreground"
+                          sortColumn === "status"
+                            ? "font-semibold text-foreground"
+                            : ""
                         )}
                       >
                         Status
@@ -339,7 +343,9 @@ export default function InventoryPage() {
                       <div
                         className={cn(
                           "flex items-center gap-2",
-                          sortColumn === "medicineType" && "text-foreground"
+                          sortColumn === "medicineType"
+                            ? "font-semibold text-foreground"
+                            : ""
                         )}
                       >
                         Tip
@@ -361,7 +367,9 @@ export default function InventoryPage() {
                       <div
                         className={cn(
                           "flex items-center gap-2",
-                          sortColumn === "quantity" && "text-foreground"
+                          sortColumn === "quantity"
+                            ? "font-semibold text-foreground"
+                            : ""
                         )}
                       >
                         Cantitate
@@ -383,7 +391,9 @@ export default function InventoryPage() {
                       <div
                         className={cn(
                           "flex items-center gap-2",
-                          sortColumn === "expiryDate" && "text-foreground"
+                          sortColumn === "expiryDate"
+                            ? "font-semibold text-foreground"
+                            : ""
                         )}
                       >
                         Expirare
