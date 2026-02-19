@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   model: devstralModel,
   input: { schema: GenerateMedicineDescriptionInputSchema },
   output: { schema: GenerateMedicineDescriptionOutputSchema },
-  prompt: `Ești un expert medical. Generează o descriere detaliată și bine formatată pentru următorul medicament: {{{medicineName}}}. Descrierea trebuie să fie în limba română și să includă următoarele secțiuni, fiecare pe un rând nou și cu un titlu boldat (ex: **Utilizare:**): \n- **Utilizare:** Pentru ce este folosit medicamentul. \n- **Substanță activă:** Care este principala substanță activă. \n- **Efecte secundare comune:** O listă scurtă cu cele mai comune efecte secundare. \n\nAsigură-te că textul este clar, concis și ușor de înțeles pentru un non-specialist.`,
+  prompt: `Ești un expert medical. Generează o descriere detaliată și bine formatată pentru următorul medicament: {{{medicineName}}}. Descrierea trebuie să fie în limba română și să includă următoarele secțiuni, fiecare pe un rând nou și cu un titlu boldat (ex: **Utilizare:**): \n- **Utilizare:** Pentru ce este folosit medicamentul. \n- **Substanță activă:** Care este principala substanță activă. \n- **Mod de administrare:** Cum se administrează medicamentul. \n- **Efecte secundare comune:** O listă scurtă cu cele mai comune efecte secundare. \n\nAsigură-te că textul este clar, concis și ușor de înțeles pentru un non-specialist.`,
 });
 
 const generateMedicineDescriptionFlow = ai.defineFlow(
