@@ -1,113 +1,126 @@
 /**
- * This Firestore Security Ruleset establishes a strict, user-centric security model
- * for the MediShelf application. Its core philosophy is data isolation, ensuring that
- * each user can only ever access their own information.
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All data is
+ * isolated within a user-specific document tree, ensuring that a user can only ever
+ * access their own information. Anonymous and password-based sign-in are supported,
+ * but both require a valid authentication session to access any data.
  *
- * Core Philosophy:
- * The rules enforce a strict user-ownership model. All data is scoped to the
- * authenticated user, and there is no concept of public or shared data. This
- * provides maximum privacy and security by default.
- *
- * Data Structure:
- * All user-generated content, specifically medicine inventories, is nested within a
- * dedicated user document. The hierarchical structure is `/users/{userId}/medicines/{medicineId}`.
- * This design makes ownership explicit in the document path itself.
+ * Data Structure: The data is organized hierarchically. A top-level 'users' collection
+ * holds user profile documents. Each user profile document, identified by the user's
+ * UID, contains a 'medicines' subcollection for that user's private inventory.
+ * The path itself (/users/{userId}/...) is the primary mechanism for authorization.
  *
  * Key Security Decisions:
- * - User Data Isolation: All access checks are based on matching the authenticated
- *   user's UID (`request.auth.uid`) with the `{userId}` in the document path.
- * - No Public Listing: Listing the top-level `/users` collection is explicitly
- *   disallowed to prevent enumeration of application users.
- * - Path-Based Security: Rules leverage the document path for authorization, which
- *   is highly performant and avoids costly cross-document `get()` calls. This
- *   ensures that security checks are efficient and scalable.
- * - Prototyping Flexibility: While authorization is strict, data shape validation is
- *   minimal. This allows for rapid development and schema changes on the client-side
- *   without requiring constant updates to the security rules. Only fields critical
- *   for relational integrity (like document IDs) are validated.
+ * - User Enumeration is Disallowed: Listing the top-level '/users' collection is forbidden
+ *   to prevent malicious actors from discovering all users of the application.
+ * - Strict Ownership: All read and write operations are gated by a check that ensures the
+ *   requesting user's UID matches the {userId} in the document path.
+ * - Relational Integrity: On document creation, rules validate that the internal 'id' or
+ *   'userId' field matches the {userId} from the path, ensuring data consistency. These
+ *   linking fields are immutable and cannot be changed on update.
+ *
+ * Denormalization for Authorization: Authorization is based on the document path, which is
+ * the most performant method. The {userId} wildcard is used directly in rules, avoiding
+ * the need for any costly 'get()' or 'exists()' calls to other documents for authorization
+ * checks. The 'userId' field on Medicine documents serves as a data integrity check rather
+ * than an authorization control.
+ *
+ * Structural Segregation: User data is naturally segregated by the collection structure.
+ * A user's private medicine list is in a subcollection (/users/{userId}/medicines)
+ * which can be queried efficiently and securely without risk of exposing another user's data.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ------------------------------------------------------------------------
-    // Helper Functions
-    // ------------------------------------------------------------------------
-
+    // Helper functions for reusable logic
     /**
-     * Checks if the user is authenticated.
+     * isSignedIn
+     * Checks if the user is authenticated. This is a prerequisite for all data access.
      */
     function isSignedIn() {
       return request.auth != null;
     }
 
     /**
-     * Verifies if the authenticated user's UID matches the document's owner ID
-     * provided in the path.
+     * isOwner
+     * @param userId The user ID from the document path.
+     * Validates that the requesting user is the owner of the document.
      */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
     /**
-     * A robust check for state-changing operations (update, delete).
-     * Ensures the user is the owner AND the document already exists.
+     * isExistingOwner
+     * @param userId The user ID from the document path.
+     * A robust check for updates and deletes, ensuring the user is the owner
+     * and the document actually exists before the operation.
      */
     function isExistingOwner(userId) {
       return isOwner(userId) && resource != null;
     }
 
     /**
-     * On create, validates that the document's internal 'id' field matches the
-     * document ID from the path. This enforces relational consistency.
+     * incomingUserProfileIsValid
+     * @param userId The user ID from the document path.
+     * Validates that a new UserProfile document contains an 'id' field that
+     * matches the document's path ID, ensuring relational integrity.
      */
-    function hasValidMedicineId(medicineId) {
-      return request.resource.data.id == medicineId;
+    function incomingUserProfileIsValid(userId) {
+      return request.resource.data.id == userId;
     }
 
     /**
-     * On update, ensures that the document's internal 'id' field cannot be changed.
-     * This protects the primary relational key from being modified.
+     * updatedUserProfileIsValid
+     * Validates that the 'id' field of a UserProfile is immutable.
      */
-    function isMedicineIdImmutable() {
+    function updatedUserProfileIsValid() {
       return request.resource.data.id == resource.data.id;
     }
 
-    // ------------------------------------------------------------------------
-    // Collection Rules
-    // ------------------------------------------------------------------------
+    /**
+     * incomingMedicineIsValid
+     * @param userId The user ID from the document path.
+     * Validates that a new Medicine document contains a 'userId' field that
+     * correctly links it back to its parent user profile.
+     */
+    function incomingMedicineIsValid(userId) {
+      return request.resource.data.userId == userId;
+    }
 
     /**
-     * @description Manages user profile documents. A user can create their own
-     *              profile document and has full control over it thereafter.
+     * updatedMedicineIsValid
+     * Validates that the 'userId' field of a Medicine document is immutable.
+     */
+    function updatedMedicineIsValid() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    /**
+     * @description Rules for a user's own profile document.
      * @path /users/{userId}
-     * @allow (create) An authenticated user creating their own document at `/users/USER_ID`.
-     * @deny (create) An anonymous user attempting to create a user document.
-     * @deny (list) Any user, authenticated or not, attempting to list all user documents.
-     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     * @allow (get) An authenticated user with UID 'user123' to read their own profile at '/users/user123'.
+     * @deny (get) An authenticated user with UID 'user456' from reading the profile at '/users/user123'.
+     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && incomingUserProfileIsValid(userId);
+      allow update: if isExistingOwner(userId) && updatedUserProfileIsValid();
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Secures a user's private collection of medicine inventory.
-     *              Access is strictly limited to the user who owns the collection.
+     * @description Rules for a user's private medicine inventory.
      * @path /users/{userId}/medicines/{medicineId}
-     * @allow (get, list, create, update, delete) The user with UID matching `{userId}` performing any operation on their own medicine documents.
-     * @deny (get) User 'A' trying to read a medicine document from `/users/USER_B/medicines/...`.
-     * @deny (create) An unauthenticated user trying to add a medicine document.
-     * @principle Enforces strict document ownership within a user-scoped subcollection.
+     * @allow (list) An authenticated user 'user123' to list all documents in '/users/user123/medicines'.
+     * @deny (list) An authenticated user 'user456' from listing documents in '/users/user123/medicines'.
+     * @principle Enforces document ownership for writes and inherits access control from the parent path.
      */
     match /users/{userId}/medicines/{medicineId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && hasValidMedicineId(medicineId);
-      allow update: if isExistingOwner(userId) && isMedicineIdImmutable();
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && incomingMedicineIsValid(userId);
+      allow update: if isExistingOwner(userId) && updatedMedicineIsValid();
       allow delete: if isExistingOwner(userId);
     }
   }

@@ -1,107 +1,169 @@
 {
   "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user's profile information within the MediShelf application. This entity stores user-specific preferences and non-authentication related details.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity. This typically corresponds to the user ID from an external authentication system."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, primarily used for display or contact, not for authentication.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "themePreference": {
+          "type": "string",
+          "description": "The user's preferred application theme (e.g., 'dark', 'light')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating the last time the user profile was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "themePreference",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
     "Medicine": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Medicine",
       "type": "object",
-      "description": "Represents a single medicine item managed by the user in their inventory.",
+      "description": "Represents a single medicine entry in a user's inventory, tracking its details, quantity, and expiry.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the Medicine entity."
         },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who owns this medicine. (Relationship: UserProfile 1:N Medicine)"
+        },
         "name": {
           "type": "string",
-          "description": "The commercial or common name of the medicine (e.g., 'Aspirin', 'Paracetamol')."
+          "description": "The commercial or generic name of the medicine."
         },
         "type": {
           "type": "string",
-          "description": "The form or category of the medicine (e.g., 'Tablet', 'Syrup', 'Cream', 'Capsule')."
+          "description": "The form or type of the medicine (e.g., 'Tablet', 'Syrup', 'Cream', 'Inhaler')."
         },
         "quantity": {
           "type": "number",
-          "description": "The current quantity of the medicine available in inventory."
+          "description": "The numerical quantity of the medicine (e.g., number of pills, volume in ml, number of units)."
         },
         "unit": {
           "type": "string",
-          "description": "The unit of measurement for the quantity (e.g., 'pills', 'ml', 'grams', 'patches')."
+          "description": "The unit of measurement for the quantity (e.g., 'pills', 'ml', 'pcs')."
         },
         "purchaseDate": {
           "type": "string",
-          "description": "The date when the medicine was acquired or added to the shelf.",
+          "description": "The date when the medicine was purchased or acquired.",
           "format": "date-time"
         },
         "expiryDate": {
           "type": "string",
-          "description": "The date when the medicine expires. Crucial for expiry tracking and alerts.",
+          "description": "The expiration date of the medicine.",
           "format": "date-time"
-        },
-        "batchNumber": {
-          "type": "string",
-          "description": "An optional batch or lot number for traceability of the medicine."
         },
         "notes": {
           "type": "string",
-          "description": "Any additional notes, instructions, or specific details related to this medicine entry."
+          "description": "Any additional notes or specific instructions related to the medicine."
+        },
+        "storageLocation": {
+          "type": "string",
+          "description": "Specific location where the medicine is stored (e.g., 'bathroom cabinet', 'fridge', 'travel kit')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when this medicine entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating the last time this medicine entry was updated.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
+        "userId",
         "name",
         "type",
         "quantity",
         "unit",
         "purchaseDate",
-        "expiryDate"
+        "expiryDate",
+        "createdAt",
+        "updatedAt"
       ]
     }
   },
   "auth": {
     "providers": [
       "password",
-      "anonymous",
-      "google.com"
+      "anonymous"
     ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/users/{userId}",
+        "path": "users/{userId}",
         "definition": {
-          "entityName": "user",
+          "entityName": "UserProfile",
           "schema": {
-            "$ref": "#/backend/entities/User"
+            "$ref": "#/backend/entities/UserProfile"
           },
-          "description": "Represents a single user's profile and serves as the anchor for user-specific data. While a full 'User' schema is not provided, this collection is necessary to scope user-owned subcollections. Each document's ID will be the Firebase Authentication UID.",
+          "description": "Stores individual user profiles. Each document in this collection represents a unique user's profile information. Access is strictly controlled, allowing only the authenticated user (`request.auth.uid`) to read or write their own profile, leveraging the '{userId}' wildcard for direct authorization.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user, corresponding to Firebase Authentication UID."
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID. This is used to enforce ownership."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/medicines/{medicineId}",
+        "path": "users/{userId}/medicines/{medicineId}",
         "definition": {
           "entityName": "Medicine",
           "schema": {
             "$ref": "#/backend/entities/Medicine"
           },
-          "description": "Stores individual medicine entries for a specific user's inventory. Each document represents a medicine item and is exclusively owned by the user specified in the parent path. The `userId` is implicitly denormalized into the path for authorization independence.",
+          "description": "Stores the medicine inventory for a specific user. This is a subcollection under a user's profile, ensuring that each medicine entry is owned by and accessible only to the respective user. Authorization is derived from the parent path's '{userId}' wildcard, ensuring strong data isolation for each user's medicine shelf. Includes the 'userId' field for data integrity and efficient queries within a user's context.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user who owns this medicine entry."
+              "description": "The unique identifier of the user who owns this medicine, inherited from the parent 'users' collection."
             },
             {
               "name": "medicineId",
-              "description": "The unique identifier for a specific medicine item within a user's inventory."
+              "description": "The unique identifier for a specific medicine entry within the user's inventory."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore data structure for MediShelf prioritizes user data isolation, security, and scalability by leveraging a hierarchical path design. Medicines are stored as subcollections under individual user documents, ensuring that each user's inventory is private and easily secured. \n\n**Authorization Independence:** The core principle of authorization independence is achieved by embedding the `userId` directly into the path of the `medicines` collection: `/users/{userId}/medicines/{medicineId}`. This design makes the owner's identity (`userId`) an intrinsic part of the document's location. Consequently, Firestore security rules can evaluate access requests (read, write, update, delete) for any `medicineId` document by directly comparing `request.auth.uid` with the `userId` wildcard in the path. This eliminates the need for expensive and complex `get()` operations to fetch a parent user document to determine ownership or permissions, thereby preventing broken atomic operations (transactions/batches) and simplifying rule debugging. All necessary authorization context is available within the `request` object and the path itself.\n\n**QAPs (Rules are not Filters):** This structure inherently supports Query-As-Permissions (QAPs) by segregating data per user. When a user requests their medicine list, they will query the path `/users/{request.auth.uid}/medicines`. Firestore security rules can be written to explicitly allow `list` and `read` operations only if `request.auth.uid` matches the `userId` in the path. This ensures that any `list` query automatically operates within the secure boundary of the authenticated user's data. The database itself enforces the ownership filter through the query path, rather than requiring rules to filter a broader, potentially unauthorized dataset. This prevents over-fetching and ensures that rules effectively act as gates, not filters, for `list` operations, leading to efficient and secure data retrieval."
+    "reasoning": "The recommended Firestore structure for MediShelf prioritizes strong user data isolation, clear ownership, and simplified security rules by leveraging hierarchical paths and denormalized authorization context. Each user's data, including their profile and medicine inventory, is strictly private and nested under their unique user ID.\n\n**Authorization Independence:**\n*   For `UserProfile` documents at `/users/{userId}`, authorization is achieved by directly comparing `request.auth.uid` with the `{userId}` wildcard in the path. This eliminates the need for `get()` calls within security rules, as the ownership context is implicitly provided by the document's location. A user can only access the document whose path matches their authenticated UID.\n*   Similarly, for `Medicine` documents at `/users/{userId}/medicines/{medicineId}`, the `{userId}` wildcard in the parent path serves as the authorization context. Security rules can directly check `request.auth.uid == userId`. The `userId` field within the `Medicine` document schema acts as a data integrity constraint and enables efficient lookups, but it is not strictly required for authorization when using this path structure, adhering to the principle of denormalizing authorization context via the path itself.\n\n**QAPs (Queries Are Not Filters):**\n*   The structural segregation mandates that each collection (`users` and `medicines` subcollection) holds documents with a homogeneous security posture (private to the `userId`).\n*   For `/users/{userId}`, only the authenticated user can access their own profile. Any attempt to list or retrieve another user's profile directly from the `/users` collection (if it were even queryable in such a manner) would be denied by rules enforcing `request.auth.uid == userId`.\n*   For `/users/{userId}/medicines`, users can only perform `list` operations on their *own* subcollection. For instance, a query `db.collection('users').doc(request.auth.uid).collection('medicines').get()` will return only the medicines belonging to the authenticated user. Security rules will prevent any authenticated user from querying or listing medicines under another user's ID (e.g., `db.collection('users').doc('otherUserUid').collection('medicines')`), thus ensuring that rules are not used to filter out unauthorized data from a broader query result, but rather to prevent access to unauthorized collections entirely."
   }
 }
