@@ -115,7 +115,7 @@ const medicineTypes = [
 ] as const;
 
 const medicineSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   name: z.string().min(2, "Numele trebuie să aibă cel puțin 2 caractere."),
   medicineType: z.enum(medicineTypes),
   quantity: z.coerce
@@ -143,7 +143,6 @@ export function AddEditMedicineDialog({
   const form = useForm<z.infer<typeof medicineSchema>>({
     resolver: zodResolver(medicineSchema),
     defaultValues: {
-      id: "",
       name: "",
       medicineType: "Pastilă",
       quantity: 1,
@@ -160,7 +159,7 @@ export function AddEditMedicineDialog({
         });
       } else {
         form.reset({
-          id: crypto.randomUUID(),
+          id: undefined,
           name: "",
           medicineType: "Pastilă",
           quantity: 1,
@@ -271,9 +270,7 @@ export function AddEditMedicineDialog({
     };
 
     try {
-      await onSave(
-        medicineToEdit ? { ...medicineToEdit, ...valuesToSave } : valuesToSave
-      );
+      await onSave(valuesToSave);
     } catch (error) {
       console.error("Failed to save medicine:", error);
     } finally {

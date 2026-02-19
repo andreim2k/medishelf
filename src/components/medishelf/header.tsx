@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, BarChart2, PanelLeft } from "lucide-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Home, Package, BarChart2, PanelLeft, LogOut } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "./logo-icon";
+import { useAuth, useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const navItems = [
   { href: "/", label: "Panou de control", icon: Home },
@@ -21,6 +20,15 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const auth = useAuth();
+  const { user } = useUser();
+
+  const handleLogout = () => {
+    if (auth) {
+      signOut(auth);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <Sheet>
@@ -37,7 +45,13 @@ export function Header() {
               className="group flex items-center gap-3 text-lg font-semibold"
             >
               <LogoIcon className="h-7 w-7 flex-shrink-0" />
-              <span className="font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+              <span
+                className="font-bold tracking-tight"
+                style={{
+                  fontFamily: "Space Grotesk, sans-serif",
+                  color: "hsl(var(--primary))",
+                }}
+              >
                 medVentory
               </span>
             </Link>
@@ -57,23 +71,53 @@ export function Header() {
           </nav>
         </SheetContent>
       </Sheet>
-      
+
       <div className="hidden items-center gap-2 sm:flex">
         <LogoIcon className="h-7 w-7" />
-        <div className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+        <div
+          className="text-2xl font-bold tracking-tight"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            color: "hsl(var(--primary))",
+          }}
+        >
           medVentory
         </div>
       </div>
-      
+
       <Link href="/" className="flex items-center gap-2 sm:hidden">
         <LogoIcon className="h-7 w-7" />
-        <div className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'hsl(var(--primary))' }}>
+        <div
+          className="text-xl font-bold tracking-tight"
+          style={{
+            fontFamily: "Space Grotesk, sans-serif",
+            color: "hsl(var(--primary))",
+          }}
+        >
           medVentory
         </div>
       </Link>
 
-      <div className="flex flex-1 items-center justify-end">
+      <div className="flex flex-1 items-center justify-end gap-4">
+        {user && (
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.photoURL || undefined} />
+              <AvatarFallback>
+                {user.displayName?.charAt(0) || user.email?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        )}
         <ThemeToggle />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleLogout}
+          aria-label="Deconectare"
+        >
+          <LogOut className="h-5 w-5" />
+        </Button>
       </div>
     </header>
   );

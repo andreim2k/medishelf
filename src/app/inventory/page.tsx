@@ -11,9 +11,10 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  Loader2,
 } from "lucide-react";
+import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 import type { Medicine } from "@/lib/types";
-import { initialMedicines } from "@/lib/data";
 import { AddEditMedicineDialog } from "@/components/medishelf/add-edit-medicine-dialog";
 import { MedicineCard } from "@/components/medishelf/medicine-card";
 import { MedicineListItem } from "@/components/medishelf/medicine-list-item";
@@ -48,6 +49,7 @@ import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 import { useToast } from "@/hooks/use-toast";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 
 type SortableColumn =
   | "name"
@@ -57,7 +59,16 @@ type SortableColumn =
   | "expiryDate";
 
 export default function InventoryPage() {
-  const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const medicinesQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, "users", user.uid, "medicines");
+  }, [firestore, user]);
+
+  const { data: medicines, loading } = useCollection<Medicine>(medicinesQuery);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -90,25 +101,40 @@ export default function InventoryPage() {
     setMedicineToDelete(id);
     setIsAlertOpen(true);
   };
-  
+
   const handleViewDetails = (medicine: Medicine) => {
     setMedicineToView(medicine);
     setIsDetailsOpen(true);
   };
 
   const confirmDelete = () => {
-    if (medicineToDelete) {
-      setMedicines(medicines.filter((m) => m.id !== medicineToDelete));
+    if (medicineToDelete && firestore && user) {
+      const docRef = doc(
+        firestore,
+        "users",
+        user.uid,
+        "medicines",
+        medicineToDelete
+      );
+      deleteDoc(docRef);
       setMedicineToDelete(null);
+      toast({
+        title: "Medicament Șters",
+        description: "Medicamentul a fost eliminat din inventarul tău.",
+      });
     }
     setIsAlertOpen(false);
   };
 
   const handleSaveMedicine = async (medicine: Medicine) => {
+    if (!firestore || !user) return;
+
     if (medicineToEdit) {
+      const { id, ...medicineData } = medicine;
+      const docRef = doc(firestore, "users", user.uid, "medicines", id);
+
       if (medicineToEdit.name !== medicine.name) {
-        // Name changed, so regenerate description
-        const { id, update } = toast({
+        const { id: toastId, update } = toast({
           title: "Actualizare descriere...",
           description: `Numele medicamentului a fost schimbat. Se regenerează descrierea pentru ${medicine.name}.`,
         });
@@ -117,51 +143,39 @@ export default function InventoryPage() {
             medicineName: medicine.name,
           });
           const updatedMedicine = {
-            ...medicine,
+            ...medicineData,
             description: descResult.description,
           };
-          setMedicines(
-            medicines.map((m) =>
-              m.id === updatedMedicine.id ? updatedMedicine : m
-            )
-          );
+          setDoc(docRef, updatedMedicine, { merge: true });
           update({
-            id,
+            id: toastId,
             title: "Descriere Actualizată",
             description: `Descrierea pentru ${updatedMedicine.name} a fost actualizată de AI.`,
           });
         } catch (error) {
           console.error("Failed to regenerate description", error);
           const updatedMedicine = {
-            ...medicine,
+            ...medicineData,
             description: "Descrierea nu a putut fi regenerată.",
           };
-          setMedicines(
-            medicines.map((m) =>
-              m.id === updatedMedicine.id ? updatedMedicine : m
-            )
-          );
+          setDoc(docRef, updatedMedicine, { merge: true });
           update({
-            id,
+            id: toastId,
             variant: "destructive",
             title: "Eroare AI",
             description: "Descrierea nu a putut fi regenerată.",
           });
         }
       } else {
-        // Name did NOT change, just update other fields
-        setMedicines(
-          medicines.map((m) =>
-            m.id === medicine.id ? { ...m, ...medicine } : m
-          )
-        );
+        setDoc(docRef, medicineData, { merge: true });
         toast({
           title: "Medicament Actualizat",
           description: `${medicine.name} a fost actualizat cu succes.`,
         });
       }
     } else {
-      const { id, update } = toast({
+      const collectionRef = collection(firestore, "users", user.uid, "medicines");
+      const { id: toastId, update } = toast({
         title: "Generare descriere...",
         description: `Se generează descrierea pentru ${medicine.name} cu ajutorul AI.`,
       });
@@ -169,14 +183,10 @@ export default function InventoryPage() {
         const descResult = await generateMedicineDescription({
           medicineName: medicine.name,
         });
-        const newMedicine = {
-          ...medicine,
-          id: crypto.randomUUID(),
-          description: descResult.description,
-        };
-        setMedicines([...medicines, newMedicine]);
+        const newMedicine = { ...medicine, description: descResult.description };
+        addDoc(collectionRef, newMedicine);
         update({
-          id,
+          id: toastId,
           title: "Descriere Generată",
           description: `Descrierea pentru ${newMedicine.name} a fost creată de AI.`,
         });
@@ -184,12 +194,11 @@ export default function InventoryPage() {
         console.error("Failed to generate description", error);
         const newMedicine = {
           ...medicine,
-          id: crypto.randomUUID(),
           description: "Nu s-a putut genera descrierea.",
         };
-        setMedicines([...medicines, newMedicine]);
+        addDoc(collectionRef, newMedicine);
         update({
-          id,
+          id: toastId,
           variant: "destructive",
           title: "Eroare AI",
           description: "Descrierea nu a putut fi generată.",
@@ -208,6 +217,8 @@ export default function InventoryPage() {
   };
 
   const filteredAndSortedMedicines = useMemo(() => {
+    if (!medicines) return [];
+    
     const getStatusSortValue = (expiryDate: string) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -266,7 +277,6 @@ export default function InventoryPage() {
           return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
         }
 
-        // name or medicineType
         const aValue = a[sortColumn] as string;
         const bValue = b[sortColumn] as string;
 
@@ -285,9 +295,18 @@ export default function InventoryPage() {
   ]);
 
   const medicineTypes = useMemo(() => {
+    if (!medicines) return [];
     const types = new Set(medicines.map((m) => m.medicineType));
     return Array.from(types);
   }, [medicines]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <>

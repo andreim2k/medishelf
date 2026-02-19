@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { initialMedicines } from "@/lib/data";
-import type { Medicine } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -29,6 +27,10 @@ import {
 import { StatusBadge } from "@/components/medishelf/status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
+import { useCollection, useFirestore, useUser } from "@/firebase";
+import { collection } from "firebase/firestore";
+import type { Medicine } from "@/lib/types";
+import { Loader2 } from "lucide-react";
 
 const COLORS = {
   safe: "hsl(var(--success))",
@@ -52,21 +54,34 @@ const TYPE_COLORS = [
 ];
 
 export default function ReportsPage() {
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const medicinesQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, "users", user.uid, "medicines");
+  }, [firestore, user]);
+
+  const { data: medicines, loading } = useCollection<Medicine>(medicinesQuery);
+
   const { expiryStatusData, medicineTypeData, expiringMedicines } =
     useMemo(() => {
+      if (!medicines) {
+        return {
+          expiryStatusData: [],
+          medicineTypeData: [],
+          expiringMedicines: [],
+        };
+      }
+
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const statusCounts = {
-        safe: 0,
-        expiring_soon: 0,
-        expired: 0,
-      };
-
+      const statusCounts = { safe: 0, expiring_soon: 0, expired: 0 };
       const typeCounts: { [key: string]: number } = {};
       const expiringMeds: Medicine[] = [];
 
-      initialMedicines.forEach((med) => {
+      medicines.forEach((med) => {
         const expiry = new Date(med.expiryDate);
         const diffDays = Math.ceil(
           (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
@@ -113,7 +128,15 @@ export default function ReportsPage() {
         medicineTypeData,
         expiringMedicines: expiringMeds,
       };
-    }, []);
+    }, [medicines]);
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <>

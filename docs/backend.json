@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "Medicine": {
+      "title": "Medicine",
+      "description": "Represents a single medicine in the user's inventory.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "medicineType": {
+          "type": "string",
+          "enum": [
+            "Pastilă",
+            "Capsulă",
+            "Plicuri",
+            "Lichid",
+            "Sirop",
+            "Picături",
+            "Cremă",
+            "Unguent",
+            "Gel",
+            "Spray nazal",
+            "Spray oral",
+            "Inhalator",
+            "Injecție",
+            "Supozitor",
+            "Ovul",
+            "Plasture",
+            "Altul"
+          ]
+        },
+        "quantity": {
+          "type": "number"
+        },
+        "purchaseDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "expiryDate": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "required": [
+        "name",
+        "medicineType",
+        "quantity",
+        "purchaseDate",
+        "expiryDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": ["Google"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/backend/entities/UserProfile"
+      },
+      "description": "User profile documents."
+    },
+    "/users/{userId}/medicines/{medicineId}": {
+      "schema": {
+        "$ref": "#/backend/entities/Medicine"
+      },
+      "description": "Medicine documents for a specific user."
+    }
+  }
+}

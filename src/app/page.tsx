@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, Activity, Users, CreditCard } from "lucide-react";
+import { Package, Activity, Users, CreditCard, Loader2 } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -16,7 +16,9 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { initialMedicines } from "@/lib/data";
+import { useCollection, useFirestore, useUser } from "@/firebase";
+import type { Medicine } from "@/lib/types";
+import { collection } from "firebase/firestore";
 
 const generateChartData = () => [
   { name: "Ian", total: Math.floor(Math.random() * 5) + 1 },
@@ -33,38 +35,56 @@ const generateChartData = () => [
   { name: "Dec", total: Math.floor(Math.random() * 5) + 1 },
 ];
 
-
 export default function Home() {
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [chartData, setChartData] = useState<any[]>([]);
 
+  const medicinesQuery = useMemo(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, "users", user.uid, "medicines");
+  }, [firestore, user]);
+
+  const { data: medicines, loading } = useCollection<Medicine>(medicinesQuery);
+
   useEffect(() => {
+    // This can be enhanced to use real data
     setChartData(generateChartData());
   }, []);
 
-  const expiringSoonCount = initialMedicines.filter((med) => {
+  const { expiringSoonCount, expiredCount } = useMemo(() => {
+    if (!medicines) return { expiringSoonCount: 0, expiredCount: 0 };
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const expiry = new Date(med.expiryDate);
-    const diffDays = Math.ceil(
-      (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    return medicines.reduce(
+      (acc, med) => {
+        const expiry = new Date(med.expiryDate);
+        const diffDays = Math.ceil(
+          (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (diffDays < 0) {
+          acc.expiredCount++;
+        } else if (diffDays <= 30) {
+          acc.expiringSoonCount++;
+        }
+        return acc;
+      },
+      { expiringSoonCount: 0, expiredCount: 0 }
     );
-    return diffDays >= 0 && diffDays <= 30;
-  }).length;
+  }, [medicines]);
 
-  const expiredCount = initialMedicines.filter((med) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const expiry = new Date(med.expiryDate);
-    const diffDays = Math.ceil(
-      (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
     );
-    return diffDays < 0;
-  }).length;
+  }
 
   return (
     <>
       <div className="flex items-center justify-between">
-         <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
           Panou de control
         </h1>
       </div>
@@ -77,7 +97,7 @@ export default function Home() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{initialMedicines.length}</div>
+            <div className="text-2xl font-bold">{medicines?.length || 0}</div>
             <p className="text-xs text-muted-foreground">
               în inventarul dvs.
             </p>
@@ -85,7 +105,9 @@ export default function Home() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expiră în curând</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Expiră în curând
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -101,7 +123,9 @@ export default function Home() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{expiredCount}</div>
+            <div className="text-2xl font-bold text-destructive">
+              {expiredCount}
+            </div>
             <p className="text-xs text-muted-foreground">
               medicamente sunt expirate
             </p>
@@ -113,7 +137,7 @@ export default function Home() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2</div>
+            <div className="text-2xl font-bold">+0</div>
             <p className="text-xs text-muted-foreground">
               adăugări în această lună
             </p>
@@ -145,7 +169,7 @@ export default function Home() {
                   axisLine={false}
                   tickFormatter={(value) => `${value}`}
                 />
-                 <Tooltip
+                <Tooltip
                   cursor={{ fill: "hsl(var(--accent))", opacity: 0.5 }}
                   contentStyle={{
                     background: "hsl(var(--background))",
@@ -166,18 +190,20 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Adăugate Recent</CardTitle>
             <CardDescription>
-              Ați adăugat {initialMedicines.length} medicamente în total.
+              Ați adăugat {medicines?.length || 0} medicamente în total.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {initialMedicines.slice(0, 4).map((med) => (
+            {medicines?.slice(0, 4).map((med) => (
               <div className="flex items-center" key={med.id}>
                 <div className="mr-4 flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
                   <Package className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="flex-grow">
                   <p className="text-sm font-medium leading-none">{med.name}</p>
-                  <p className="text-sm text-muted-foreground">{med.medicineType}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {med.medicineType}
+                  </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium">x{med.quantity}</p>
