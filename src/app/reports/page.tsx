@@ -140,6 +140,8 @@ export default function ReportsPage() {
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "var(--radius)",
                   }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                  labelStyle={{ color: "hsl(var(--foreground))" }}
                 />
                 <Pie
                   data={expiryStatusData}
@@ -178,6 +180,8 @@ export default function ReportsPage() {
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "var(--radius)",
                   }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                  labelStyle={{ color: "hsl(var(--foreground))" }}
                 />
                 <Pie
                   data={medicineTypeData}

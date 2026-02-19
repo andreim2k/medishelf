@@ -70,7 +70,7 @@
     background-attachment: fixed;
   }
   .recharts-pie-label-text {
-    fill: hsl(var(--foreground));
+    fill: hsl(var(--foreground)) !important;
   }
   .recharts-legend-item {
     color: hsl(var(--foreground)) !important;
