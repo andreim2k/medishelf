@@ -106,15 +106,60 @@ export default function InventoryPage() {
 
   const handleSaveMedicine = async (medicine: Medicine) => {
     if (medicineToEdit) {
-      setMedicines(
-        medicines.map((m) =>
-          m.id === medicine.id ? { ...m, ...medicine } : m
-        )
-      );
-      toast({
-        title: "Medicament Actualizat",
-        description: `${medicine.name} a fost actualizat cu succes.`,
-      });
+      if (medicineToEdit.name !== medicine.name) {
+        // Name changed, so regenerate description
+        const { id, update } = toast({
+          title: "Actualizare descriere...",
+          description: `Numele medicamentului a fost schimbat. Se regenerează descrierea pentru ${medicine.name}.`,
+        });
+        try {
+          const descResult = await generateMedicineDescription({
+            medicineName: medicine.name,
+          });
+          const updatedMedicine = {
+            ...medicine,
+            description: descResult.description,
+          };
+          setMedicines(
+            medicines.map((m) =>
+              m.id === updatedMedicine.id ? updatedMedicine : m
+            )
+          );
+          update({
+            id,
+            title: "Descriere Actualizată",
+            description: `Descrierea pentru ${updatedMedicine.name} a fost actualizată de AI.`,
+          });
+        } catch (error) {
+          console.error("Failed to regenerate description", error);
+          const updatedMedicine = {
+            ...medicine,
+            description: "Descrierea nu a putut fi regenerată.",
+          };
+          setMedicines(
+            medicines.map((m) =>
+              m.id === updatedMedicine.id ? updatedMedicine : m
+            )
+          );
+          update({
+            id,
+            variant: "destructive",
+            title: "Eroare AI",
+            description: "Descrierea nu a putut fi regenerată.",
+          });
+        }
+      } else {
+        // Name did NOT change, just update other fields
+        setMedicines(
+          medicines.map((m) =>
+            m.id === medicine.id ? { ...m, ...medicine } : m
+          )
+        );
+        toast({
+          title: "Medicament Actualizat",
+          description: `${medicine.name} a fost actualizat cu succes.`,
+        });
+      }
     } else {
       const { id, update } = toast({
         title: "Generare descriere...",
