@@ -47,6 +47,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
+import { useToast } from "@/hooks/use-toast";
 
 type SortableColumn =
   | "name"
@@ -73,6 +74,7 @@ export default function InventoryPage() {
   const [viewMode, setViewMode] = useState<"card" | "list">("list");
   const [sortColumn, setSortColumn] = useState<SortableColumn>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const { toast } = useToast();
 
   const handleAddClick = () => {
     setMedicineToEdit(undefined);
@@ -120,6 +122,10 @@ export default function InventoryPage() {
           description: descResult.description,
         };
         setMedicines([...medicines, newMedicine]);
+        toast({
+          title: "Descriere Generată",
+          description: `Descrierea pentru ${newMedicine.name} a fost creată de AI.`,
+        });
       } catch (error) {
         console.error("Failed to generate description", error);
         const newMedicine = {
@@ -128,6 +134,11 @@ export default function InventoryPage() {
           description: "Nu s-a putut genera descrierea.",
         };
         setMedicines([...medicines, newMedicine]);
+        toast({
+          variant: "destructive",
+          title: "Eroare AI",
+          description: "Descrierea nu a putut fi generată.",
+        });
       }
     }
   };
