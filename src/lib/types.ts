@@ -1,5 +1,6 @@
 export type Medicine = {
   id: string;
+  userId: string;
   name: string;
   description?: string;
   medicineType:
