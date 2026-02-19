@@ -327,6 +327,7 @@ export function AddEditMedicineDialog({
                       <PopoverContent
                         className="w-auto p-0"
                         align="start"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
                       >
                         <Calendar
                           mode="single"
@@ -371,6 +372,7 @@ export function AddEditMedicineDialog({
                       <PopoverContent
                         className="w-auto p-0"
                         align="start"
+                        onOpenAutoFocus={(e) => e.preventDefault()}
                       >
                         <Calendar
                           mode="single"
