@@ -27,7 +27,7 @@ import {
 import { StatusBadge } from "@/components/medishelf/status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
-import { useCollection, useFirestore, useUser } from "@/firebase";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { Medicine } from "@/lib/types";
 import { Loader2 } from "lucide-react";
@@ -57,7 +57,7 @@ export default function ReportsPage() {
   const { user } = useUser();
   const firestore = useFirestore();
 
-  const medicinesQuery = useMemo(() => {
+  const medicinesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, "users", user.uid, "medicines");
   }, [firestore, user]);

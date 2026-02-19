@@ -16,7 +16,7 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { useCollection, useFirestore, useUser } from "@/firebase";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
 import type { Medicine } from "@/lib/types";
 import { collection } from "firebase/firestore";
 
@@ -40,7 +40,7 @@ export default function Home() {
   const firestore = useFirestore();
   const [chartData, setChartData] = useState<any[]>([]);
 
-  const medicinesQuery = useMemo(() => {
+  const medicinesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, "users", user.uid, "medicines");
   }, [firestore, user]);

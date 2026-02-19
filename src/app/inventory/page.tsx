@@ -49,7 +49,7 @@ import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
 import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 import { useToast } from "@/hooks/use-toast";
-import { useCollection, useFirestore, useUser } from "@/firebase";
+import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
 
 type SortableColumn =
   | "name"
@@ -62,7 +62,7 @@ export default function InventoryPage() {
   const { user } = useUser();
   const firestore = useFirestore();
 
-  const medicinesQuery = useMemo(() => {
+  const medicinesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return collection(firestore, "users", user.uid, "medicines");
   }, [firestore, user]);
