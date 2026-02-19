@@ -111,7 +111,15 @@ export default function InventoryPage() {
           m.id === medicine.id ? { ...m, ...medicine } : m
         )
       );
+      toast({
+        title: "Medicament Actualizat",
+        description: `${medicine.name} a fost actualizat cu succes.`,
+      });
     } else {
+      const { id, update } = toast({
+        title: "Generare descriere...",
+        description: `Se generează descrierea pentru ${medicine.name} cu ajutorul AI.`,
+      });
       try {
         const descResult = await generateMedicineDescription({
           medicineName: medicine.name,
@@ -122,7 +130,8 @@ export default function InventoryPage() {
           description: descResult.description,
         };
         setMedicines([...medicines, newMedicine]);
-        toast({
+        update({
+          id,
           title: "Descriere Generată",
           description: `Descrierea pentru ${newMedicine.name} a fost creată de AI.`,
         });
@@ -134,7 +143,8 @@ export default function InventoryPage() {
           description: "Nu s-a putut genera descrierea.",
         };
         setMedicines([...medicines, newMedicine]);
-        toast({
+        update({
+          id,
           variant: "destructive",
           title: "Eroare AI",
           description: "Descrierea nu a putut fi generată.",
