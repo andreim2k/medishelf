@@ -174,6 +174,7 @@ export default function InventoryPage() {
         });
       }
     } else {
+      const { id, ...medicineData } = medicine;
       const collectionRef = collection(firestore, "users", user.uid, "medicines");
       const { id: toastId, update } = toast({
         title: "Generare descriere...",
@@ -183,7 +184,7 @@ export default function InventoryPage() {
         const descResult = await generateMedicineDescription({
           medicineName: medicine.name,
         });
-        const newMedicine = { ...medicine, description: descResult.description };
+        const newMedicine = { ...medicineData, description: descResult.description };
         addDoc(collectionRef, newMedicine);
         update({
           id: toastId,
@@ -193,7 +194,7 @@ export default function InventoryPage() {
       } catch (error) {
         console.error("Failed to generate description", error);
         const newMedicine = {
-          ...medicine,
+          ...medicineData,
           description: "Nu s-a putut genera descrierea.",
         };
         addDoc(collectionRef, newMedicine);
