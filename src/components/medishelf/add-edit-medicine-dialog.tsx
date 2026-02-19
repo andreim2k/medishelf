@@ -319,7 +319,7 @@ export function AddEditMedicineDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="start" side="bottom" sideOffset={4}>
                         <Calendar
                           mode="single"
                           selected={field.value}
@@ -327,7 +327,6 @@ export function AddEditMedicineDialog({
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
                           }
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
@@ -360,12 +359,11 @@ export function AddEditMedicineDialog({
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0" align="start" side="bottom" sideOffset={4}>
                         <Calendar
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          initialFocus
                         />
                       </PopoverContent>
                     </Popover>
