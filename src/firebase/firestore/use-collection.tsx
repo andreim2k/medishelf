@@ -7,6 +7,8 @@ import type {
   QuerySnapshot,
 } from 'firebase/firestore';
 import { onSnapshot } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export function useCollection<T extends DocumentData>(
   query: Query<T> | null
@@ -35,8 +37,12 @@ export function useCollection<T extends DocumentData>(
         setError(null);
       },
       (err) => {
-        console.error('Error listening to collection:', err);
-        setError(err);
+        const permissionError = new FirestorePermissionError({
+          path: query.path,
+          operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setError(permissionError);
         setLoading(false);
       }
     );
