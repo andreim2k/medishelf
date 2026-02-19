@@ -38,13 +38,8 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       onPointerDownOutside={(event) => {
-        // Radix fires a CustomEvent; the actual clicked element is in detail.originalEvent.target
-        const target = (event.detail?.originalEvent?.target ?? event.target) as HTMLElement;
-        if (
-          target.closest('[data-radix-popper-content-wrapper]') ||
-          target.closest('[data-radix-popover-content]') ||
-          target.closest('.rdp')
-        ) {
+        const target = event.target as HTMLElement;
+        if (target.closest('[data-radix-popper-content-wrapper]')) {
           event.preventDefault();
         }
       }}
