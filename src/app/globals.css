@@ -69,4 +69,10 @@
                       radial-gradient(at 79% 53%, hsl(var(--primary) / 0.1), transparent 50%);
     background-attachment: fixed;
   }
+  .recharts-pie-label-text {
+    fill: hsl(var(--foreground));
+  }
+  .recharts-legend-item {
+    color: hsl(var(--foreground)) !important;
+  }
 }
