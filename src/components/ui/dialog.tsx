@@ -37,10 +37,12 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
-      onPointerDownOutside={(event) => {
-        const originalEvent = event.detail.originalEvent;
-        const target = originalEvent.target as HTMLElement;
-        if (originalEvent.pointerType === 'mouse' && target.closest('[data-radix-popper-content-wrapper]')) {
+      onInteractOutside={(event) => {
+        const target = event.target as HTMLElement;
+        // Prevent dialog from closing when clicking inside popover/calendar
+        if (target.closest('[data-radix-popover-content]') || 
+            target.closest('[data-radix-popper-content-wrapper]') ||
+            target.closest('.rdp')) {
           event.preventDefault();
         }
       }}
