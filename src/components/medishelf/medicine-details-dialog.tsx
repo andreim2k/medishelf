@@ -36,6 +36,16 @@ export function MedicineDetailsDialog({
   const renderDescription = (description?: string) => {
     if (!description) return null;
 
+    const renderWithItalics = (text: string) => {
+      const parts = text.split(/(\*.*?\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith('*') && part.endsWith('*')) {
+          return <i key={i}>{part.slice(1, -1)}</i>;
+        }
+        return part;
+      });
+    };
+
     const sections: { title: string; content: string[] }[] = [];
     let currentSection: { title: string; content: string[] } | null = null;
 
@@ -84,15 +94,15 @@ export function MedicineDetailsDialog({
               {listItems.map((item, itemIndex) => (
                 <div key={itemIndex} className="flex items-start">
                   <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
-                  <span className="text-muted-foreground">{item}</span>
+                  <span className="text-muted-foreground">{renderWithItalics(item)}</span>
                 </div>
               ))}
               {sideEffectsComment && (
-                 <p className="text-sm text-muted-foreground/80 pt-2">{sideEffectsComment}</p>
+                 <p className="text-sm text-muted-foreground/80 pt-2">{renderWithItalics(sideEffectsComment)}</p>
               )}
             </>
           ) : (
-            <p className="text-muted-foreground">{section.content.join('\n')}</p>
+            <p className="text-muted-foreground">{renderWithItalics(section.content.join('\n'))}</p>
           )}
           </div>
         </div>
