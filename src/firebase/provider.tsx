@@ -156,11 +156,13 @@ export const useFirebaseApp = (): FirebaseApp => {
 
 type MemoFirebase <T> = T & {__memo?: boolean};
 
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
+export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (T & { __memo: true }) {
   const memoized = useMemo(factory, deps);
   
-  if(typeof memoized !== 'object' || memoized === null) return memoized;
-  (memoized as MemoFirebase<T>).__memo = true;
+  if(typeof memoized === 'object' && memoized !== null) {
+    (memoized as T & { __memo: true }).__memo = true;
+    return memoized as T & { __memo: true };
+  }
   
   return memoized;
 }

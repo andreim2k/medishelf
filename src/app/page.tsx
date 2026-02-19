@@ -20,25 +20,9 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebas
 import type { Medicine } from "@/lib/types";
 import { collection } from "firebase/firestore";
 
-const generateChartData = () => [
-  { name: "Ian", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Feb", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Mar", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Apr", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Mai", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Iun", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Iul", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Aug", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Sep", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Oct", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Nov", total: Math.floor(Math.random() * 5) + 1 },
-  { name: "Dec", total: Math.floor(Math.random() * 5) + 1 },
-];
-
 export default function Home() {
   const { user } = useUser();
   const firestore = useFirestore();
-  const [chartData, setChartData] = useState<any[]>([]);
 
   const medicinesQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -47,29 +31,68 @@ export default function Home() {
 
   const { data: medicines, loading } = useCollection<Medicine>(medicinesQuery);
 
-  useEffect(() => {
-    // This can be enhanced to use real data
-    setChartData(generateChartData());
-  }, []);
+  const chartData = useMemo(() => {
+    const monthNames = ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    if (!medicines) {
+        return monthNames.map(name => ({ name, total: 0 }));
+    }
 
-  const { expiringSoonCount, expiredCount } = useMemo(() => {
-    if (!medicines) return { expiringSoonCount: 0, expiredCount: 0 };
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return medicines.reduce(
-      (acc, med) => {
-        const expiry = new Date(med.expiryDate);
-        const diffDays = Math.ceil(
-          (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-        );
-        if (diffDays < 0) {
-          acc.expiredCount++;
-        } else if (diffDays <= 30) {
-          acc.expiringSoonCount++;
+    const monthlyCounts = medicines.reduce((acc, med) => {
+        try {
+            const purchaseDate = new Date(med.purchaseDate);
+            // Check if the date is valid before processing
+            if (!isNaN(purchaseDate.getTime())) {
+                const month = purchaseDate.getMonth(); // 0-11
+                acc[month] = (acc[month] || 0) + 1;
+            }
+        } catch (e) {
+            // Ignore medicines with invalid date format
         }
         return acc;
+    }, {} as Record<number, number>);
+
+    return monthNames.map((name, index) => ({
+        name,
+        total: monthlyCounts[index] || 0
+    }));
+  }, [medicines]);
+
+
+  const { expiringSoonCount, expiredCount, addedThisMonthCount } = useMemo(() => {
+    if (!medicines) return { expiringSoonCount: 0, expiredCount: 0, addedThisMonthCount: 0 };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    return medicines.reduce(
+      (acc, med) => {
+        try {
+            const expiry = new Date(med.expiryDate);
+            if (!isNaN(expiry.getTime())) {
+                const diffDays = Math.ceil(
+                  (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                );
+                if (diffDays < 0) {
+                  acc.expiredCount++;
+                } else if (diffDays <= 30) {
+                  acc.expiringSoonCount++;
+                }
+            }
+
+            const purchaseDate = new Date(med.purchaseDate);
+            if (!isNaN(purchaseDate.getTime())) {
+                if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
+                    acc.addedThisMonthCount++;
+                }
+            }
+        } catch(e) {
+            // Ignore records with invalid dates
+        }
+        
+        return acc;
       },
-      { expiringSoonCount: 0, expiredCount: 0 }
+      { expiringSoonCount: 0, expiredCount: 0, addedThisMonthCount: 0 }
     );
   }, [medicines]);
 
@@ -137,7 +160,7 @@ export default function Home() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+0</div>
+            <div className="text-2xl font-bold">+{addedThisMonthCount}</div>
             <p className="text-xs text-muted-foreground">
               adăugări în această lună
             </p>
