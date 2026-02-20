@@ -155,11 +155,13 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (T & { __memo: true }) {
+export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T {
   const memoized = useMemo(factory, deps);
   
-  if(typeof memoized === 'object' && memoized !== null) {
-    return Object.assign({}, memoized, { __memo: true }) as T & { __memo: true };
+  if (typeof memoized === 'object' && memoized !== null) {
+    // Directly attach the property instead of creating a new plain object.
+    // This preserves the prototype of the original object (e.g., Query, DocumentReference).
+    (memoized as any).__memo = true;
   }
   
   return memoized;
