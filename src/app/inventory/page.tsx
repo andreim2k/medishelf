@@ -448,7 +448,7 @@ export default function InventoryPage() {
                   Șterge
               </Button>
               <Button variant="outline" size="sm" onClick={handleExport}>
-                  <Download className="mr-2 h-4 w-4" />
+                  <Upload className="mr-2 h-4 w-4" />
                   Exportă selectate
               </Button>
             </>
@@ -481,12 +481,8 @@ export default function InventoryPage() {
                 </Button>
               </div>
               <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
-                <Upload className="mr-2 h-4 w-4" />
+                <Download className="mr-2 h-4 w-4" />
                 Importă
-              </Button>
-              <Button variant="outline" onClick={handleExport}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Exportă Tot
               </Button>
               <Button onClick={handleAddClick}>
                 <Plus className="mr-2 h-4 w-4" />
