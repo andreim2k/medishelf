@@ -212,8 +212,7 @@ export function AddEditMedicineDialog({
     }
     setIsGenerating(true);
     const { id: toastId, update } = toast({
-      title: "Generare descriere...",
-      description: `Se generează descrierea pentru ${medicineName} cu ajutorul AI.`,
+      title: "Cautare descriere medicament....",
     });
     try {
       const result = await generateMedicineDescription({ medicineName });
