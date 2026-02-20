@@ -12,8 +12,11 @@ import {
   ArrowDown,
   ArrowUpDown,
   Loader2,
+  Trash2,
+  Download,
+  Upload,
 } from "lucide-react";
-import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { collection, doc, addDoc, setDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { parseISO } from "date-fns";
 import type { Medicine } from "@/lib/types";
 import { AddEditMedicineDialog } from "@/components/medishelf/add-edit-medicine-dialog";
@@ -45,6 +48,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
@@ -57,6 +61,8 @@ import {
   errorEmitter,
   FirestorePermissionError,
 } from "@/firebase";
+import { ImportMedicinesDialog } from "@/components/medishelf/import-medicines-dialog";
+
 
 type SortableColumn =
   | "name"
@@ -79,6 +85,7 @@ export default function InventoryPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [medicineToView, setMedicineToView] = useState<Medicine | undefined>(
     undefined
   );
@@ -86,6 +93,7 @@ export default function InventoryPage() {
     undefined
   );
   const [medicineToDelete, setMedicineToDelete] = useState<string | null>(null);
+  const [selectedMedicines, setSelectedMedicines] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -105,7 +113,13 @@ export default function InventoryPage() {
   };
 
   const handleDeleteClick = (id: string) => {
+    setSelectedMedicines([]);
     setMedicineToDelete(id);
+    setIsAlertOpen(true);
+  };
+  
+  const handleDeleteSelectedClick = () => {
+    setMedicineToDelete(null);
     setIsAlertOpen(true);
   };
 
@@ -115,7 +129,38 @@ export default function InventoryPage() {
   };
 
   const confirmDelete = () => {
-    if (medicineToDelete && firestore && user) {
+    if (!firestore || !user) return;
+
+    if (selectedMedicines.length > 0) {
+      const batch = writeBatch(firestore);
+      selectedMedicines.forEach((id) => {
+        const docRef = doc(firestore, "users", user.uid, "medicines", id);
+        batch.delete(docRef);
+      });
+      toast({
+        title: "Se șterg...",
+        description: `${selectedMedicines.length} medicamente sunt în curs de eliminare.`,
+      });
+      batch.commit().then(() => {
+        toast({
+            title: "Medicamente Șterse",
+            description: `${selectedMedicines.length} medicamente au fost eliminate.`,
+        });
+        setSelectedMedicines([]);
+      }).catch((serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: `users/${user.uid}/medicines`,
+          operation: "delete",
+        });
+        errorEmitter.emit("permission-error", permissionError);
+        toast({
+          variant: "destructive",
+          title: "Eroare",
+          description: "Nu s-au putut șterge medicamentele selectate.",
+        });
+      });
+
+    } else if (medicineToDelete) {
       const docRef = doc(
         firestore,
         "users",
@@ -148,11 +193,12 @@ export default function InventoryPage() {
         });
       setMedicineToDelete(null);
     }
+    
     setIsAlertOpen(false);
   };
 
   const handleSaveMedicine = async (
-    medicine: Omit<Medicine, "userId" | "id"> & { id?: string }
+    medicine: Omit<Medicine, "id" | "userId"> & { id?: string }
   ) => {
     if (!firestore || !user) return;
 
@@ -185,13 +231,14 @@ export default function InventoryPage() {
           });
         });
     } else {
+      const { id, ...medicineData } = medicine; // Ensure id is not passed for new docs
       const collectionRef = collection(
         firestore,
         "users",
         user.uid,
         "medicines"
       );
-      const newMedicine = { ...medicine, userId: user.uid };
+      const newMedicine = { ...medicineData, userId: user.uid };
       toast({
         title: "Se adaugă...",
         description: `Se adaugă ${medicine.name} în inventar.`,
@@ -216,6 +263,68 @@ export default function InventoryPage() {
             description: "Nu s-a putut adăuga medicamentul.",
           });
         });
+    }
+  };
+  
+  const handleSelect = (id: string) => {
+    setSelectedMedicines((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedMedicines(filteredAndSortedMedicines.map((m) => m.id));
+    } else {
+      setSelectedMedicines([]);
+    }
+  };
+
+  const handleExport = () => {
+    const dataToExport = selectedMedicines.length > 0 
+      ? medicines?.filter(m => selectedMedicines.includes(m.id))
+      : filteredAndSortedMedicines;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      toast({ variant: 'destructive', title: 'Export Eșuat', description: 'Nu există medicamente de exportat.'});
+      return;
+    }
+
+    const jsonString = JSON.stringify(dataToExport.map(({ id, userId, ...rest }) => rest), null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "mediventory_export.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast({ title: "Export Finalizat", description: `${dataToExport.length} medicamente au fost exportate.`});
+  };
+  
+  const handleImportSave = async (importedMedicines: Omit<Medicine, "id" | "userId">[]) => {
+    if (!firestore || !user) return;
+
+    const batch = writeBatch(firestore);
+    importedMedicines.forEach(med => {
+      const newDocRef = doc(collection(firestore, "users", user.uid, "medicines"));
+      batch.set(newDocRef, { ...med, userId: user.uid });
+    });
+    
+    toast({ title: 'Se importă...', description: `Se importă ${importedMedicines.length} medicamente.`});
+
+    try {
+      await batch.commit();
+      toast({ title: 'Import Finalizat', description: `${importedMedicines.length} medicamente au fost importate cu succes.`});
+    } catch (e: any) {
+      const permissionError = new FirestorePermissionError({
+        path: `users/${user.uid}/medicines`,
+        operation: 'create',
+        requestResourceData: importedMedicines.slice(0, 5) // Send a sample
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      toast({ variant: 'destructive', title: 'Eroare la Import', description: 'Nu s-au putut importa medicamentele.'});
     }
   };
 
@@ -312,6 +421,10 @@ export default function InventoryPage() {
     return Array.from(types);
   }, [medicines]);
 
+  const isAllSelected = useMemo(() => {
+    return filteredAndSortedMedicines.length > 0 && selectedMedicines.length === filteredAndSortedMedicines.length;
+  }, [selectedMedicines, filteredAndSortedMedicines]);
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -327,36 +440,60 @@ export default function InventoryPage() {
           Inventarul Tău
         </h1>
         <div className="flex items-center gap-2">
-          <div className="mr-2 flex items-center rounded-lg border bg-card p-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode("card")}
-              className={cn(
-                "h-8 w-8",
-                viewMode === "card" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20"
-              )}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setViewMode("list")}
-              className={cn(
-                "h-8 w-8",
-                viewMode === "list" &&
-                  "bg-primary/10 text-primary hover:bg-primary/20"
-              )}
-            >
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
-          <Button onClick={handleAddClick}>
-            <Plus className="mr-2 h-4 w-4" />
-            Adaugă Medicament
-          </Button>
+          {selectedMedicines.length > 0 ? (
+            <>
+              <span className="text-sm text-muted-foreground">{selectedMedicines.length} selectat(e)</span>
+              <Button variant="outline" size="sm" onClick={handleDeleteSelectedClick}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Șterge
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportă selectate
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="mr-2 flex items-center rounded-lg border bg-card p-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setViewMode("card")}
+                  className={cn(
+                    "h-8 w-8",
+                    viewMode === "card" &&
+                      "bg-primary/10 text-primary hover:bg-primary/20"
+                  )}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setViewMode("list")}
+                  className={cn(
+                    "h-8 w-8",
+                    viewMode === "list" &&
+                      "bg-primary/10 text-primary hover:bg-primary/20"
+                  )}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+                <Upload className="mr-2 h-4 w-4" />
+                Importă
+              </Button>
+              <Button variant="outline" onClick={handleExport}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exportă Tot
+              </Button>
+              <Button onClick={handleAddClick}>
+                <Plus className="mr-2 h-4 w-4" />
+                Adaugă Medicament
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -409,6 +546,8 @@ export default function InventoryPage() {
                   onEdit={handleEditClick}
                   onDelete={handleDeleteClick}
                   onViewDetails={handleViewDetails}
+                  isSelected={selectedMedicines.includes(medicine.id)}
+                  onSelect={handleSelect}
                 />
               ))}
             </div>
@@ -417,6 +556,13 @@ export default function InventoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[50px] px-4">
+                      <Checkbox
+                        checked={isAllSelected}
+                        onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                        aria-label="Selectează tot"
+                      />
+                    </TableHead>
                     <TableHead
                       onClick={() => handleSort("name")}
                       className="cursor-pointer group hover:bg-accent/50 transition-colors"
@@ -548,6 +694,8 @@ export default function InventoryPage() {
                       onEdit={handleEditClick}
                       onDelete={handleDeleteClick}
                       onViewDetails={handleViewDetails}
+                      isSelected={selectedMedicines.includes(medicine.id)}
+                      onSelect={handleSelect}
                     />
                   ))}
                 </TableBody>
@@ -580,8 +728,10 @@ export default function InventoryPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Sunteți sigur?</AlertDialogTitle>
             <AlertDialogDescription>
-              Această acțiune nu poate fi anulată. Acest lucru va șterge
-              permanent medicamentul din inventarul dvs.
+              {selectedMedicines.length > 0 
+                ? `Această acțiune nu poate fi anulată. Acest lucru va șterge permanent ${selectedMedicines.length} medicamente din inventarul dvs.`
+                : 'Această acțiune nu poate fi anulată. Acest lucru va șterge permanent medicamentul din inventarul dvs.'
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -597,6 +747,12 @@ export default function InventoryPage() {
         isOpen={isDetailsOpen}
         setIsOpen={setIsDetailsOpen}
         medicine={medicineToView}
+      />
+      
+      <ImportMedicinesDialog 
+        isOpen={isImportDialogOpen}
+        setIsOpen={setIsImportDialogOpen}
+        onSave={handleImportSave}
       />
     </>
   );

@@ -7,24 +7,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Calendar, Package, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 type MedicineCardProps = {
   medicine: Medicine;
+  isSelected: boolean;
   onEdit: (medicine: Medicine) => void;
   onDelete: (id: string) => void;
   onViewDetails: (medicine: Medicine) => void;
+  onSelect: (id: string) => void;
 };
 
 export function MedicineCard({
   medicine,
+  isSelected,
   onEdit,
   onDelete,
   onViewDetails,
+  onSelect,
 }: MedicineCardProps) {
   const purchaseDate = format(parseISO(medicine.purchaseDate), "d MMM yyyy", {
     locale: ro,
@@ -48,19 +54,38 @@ export function MedicineCard({
 
   return (
     <Card
-      className="flex h-full cursor-pointer flex-col overflow-hidden border bg-card/60 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-primary/20 dark:bg-card/20"
-      onClick={() => onViewDetails(medicine)}
+      className={cn(
+        "flex h-full flex-col overflow-hidden border shadow-lg backdrop-blur-xl transition-all duration-300 dark:bg-card/20",
+        isSelected
+          ? "border-primary shadow-primary/20"
+          : "bg-card/60 hover:shadow-primary/20"
+      )}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
-          <CardTitle className="text-lg font-semibold">
-            {medicine.name}
-          </CardTitle>
+          <div className="flex items-center gap-3">
+             <div onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onSelect(medicine.id)}
+                aria-label="Selectează medicament"
+              />
+            </div>
+            <CardTitle
+              className="cursor-pointer text-lg font-semibold"
+              onClick={() => onViewDetails(medicine)}
+            >
+              {medicine.name}
+            </CardTitle>
+          </div>
           <StatusBadge expiryDate={medicine.expiryDate} />
         </div>
         <CardDescription>{medicine.medicineType}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow space-y-4">
+      <CardContent
+        className="flex-grow cursor-pointer space-y-4"
+        onClick={() => onViewDetails(medicine)}
+      >
         {medicine.description && (
           <p className="text-sm text-muted-foreground">
             {truncatedDescription}

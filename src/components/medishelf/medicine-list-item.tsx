@@ -5,19 +5,24 @@ import { Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
+import { Checkbox } from "../ui/checkbox";
 
 type MedicineListItemProps = {
   medicine: Medicine;
+  isSelected: boolean;
   onEdit: (medicine: Medicine) => void;
   onDelete: (id: string) => void;
   onViewDetails: (medicine: Medicine) => void;
+  onSelect: (id: string) => void;
 };
 
 export function MedicineListItem({
   medicine,
+  isSelected,
   onEdit,
   onDelete,
   onViewDetails,
+  onSelect,
 }: MedicineListItemProps) {
   const expiryDate = format(parseISO(medicine.expiryDate), "d MMM yyyy", {
     locale: ro,
@@ -40,7 +45,15 @@ export function MedicineListItem({
     <TableRow
       onClick={() => onViewDetails(medicine)}
       className="cursor-pointer"
+      data-state={isSelected ? "selected" : undefined}
     >
+      <TableCell onClick={(e) => e.stopPropagation()} className="pl-4 pr-2">
+        <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onSelect(medicine.id)}
+            aria-label="Selectează rând"
+        />
+      </TableCell>
       <TableCell>
         <div className="font-medium">{medicine.name}</div>
         {medicine.description && (
