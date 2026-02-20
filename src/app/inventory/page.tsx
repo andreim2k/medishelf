@@ -14,6 +14,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { parseISO } from "date-fns";
 import type { Medicine } from "@/lib/types";
 import { AddEditMedicineDialog } from "@/components/medishelf/add-edit-medicine-dialog";
 import { MedicineCard } from "@/components/medishelf/medicine-card";
@@ -47,7 +48,6 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { MedicineDetailsDialog } from "@/components/medishelf/medicine-details-dialog";
-import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 import { useToast } from "@/hooks/use-toast";
 import {
   useCollection,
@@ -123,155 +123,99 @@ export default function InventoryPage() {
         "medicines",
         medicineToDelete
       );
-      deleteDoc(docRef).catch((serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: docRef.path,
-          operation: "delete",
-        });
-        errorEmitter.emit("permission-error", permissionError);
-      });
-      setMedicineToDelete(null);
       toast({
-        title: "Medicament Șters",
-        description: "Medicamentul a fost eliminat din inventarul tău.",
+        title: "Se șterge...",
+        description: "Medicamentul este în curs de eliminare.",
       });
+      deleteDoc(docRef)
+        .then(() => {
+          toast({
+            title: "Medicament Șters",
+            description: "Medicamentul a fost eliminat din inventarul tău.",
+          });
+        })
+        .catch((serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: "delete",
+          });
+          errorEmitter.emit("permission-error", permissionError);
+          toast({
+            variant: "destructive",
+            title: "Eroare",
+            description: "Nu s-a putut șterge medicamentul.",
+          });
+        });
+      setMedicineToDelete(null);
     }
     setIsAlertOpen(false);
   };
 
-  const handleSaveMedicine = async (medicine: Omit<Medicine, "userId">) => {
+  const handleSaveMedicine = async (
+    medicine: Omit<Medicine, "userId" | "id"> & { id?: string }
+  ) => {
     if (!firestore || !user) return;
 
-    if (medicineToEdit) {
+    if (medicine.id) {
       const { id, ...medicineData } = medicine;
       const docRef = doc(firestore, "users", user.uid, "medicines", id);
-
-      if (medicineToEdit.name !== medicine.name) {
-        const { id: toastId, update } = toast({
-          title: "Actualizare descriere...",
-          description: `Numele medicamentului a fost schimbat. Se regenerează descrierea pentru ${medicine.name}.`,
-        });
-        try {
-          const descResult = await generateMedicineDescription({
-            medicineName: medicine.name,
+      const medicineWithUser = { ...medicineData, userId: user.uid };
+      toast({
+        title: "Se actualizează...",
+        description: `${medicine.name} este în curs de actualizare.`,
+      });
+      setDoc(docRef, medicineWithUser, { merge: true })
+        .then(() => {
+          toast({
+            title: "Medicament Actualizat",
+            description: `${medicine.name} a fost actualizat cu succes.`,
           });
-          const updatedMedicine = {
-            ...medicineData,
-            userId: user.uid,
-            description: descResult.description,
-          };
-          setDoc(docRef, updatedMedicine, { merge: true }).catch(
-            (serverError) => {
-              const permissionError = new FirestorePermissionError({
-                path: docRef.path,
-                operation: "update",
-                requestResourceData: updatedMedicine,
-              });
-              errorEmitter.emit("permission-error", permissionError);
-            }
-          );
-          update({
-            id: toastId,
-            title: "Descriere Actualizată",
-            description: `Descrierea pentru ${updatedMedicine.name} a fost actualizată de AI.`,
+        })
+        .catch((serverError) => {
+          const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: "update",
+            requestResourceData: medicineWithUser,
           });
-        } catch (error) {
-          console.error("Failed to regenerate description", error);
-          const updatedMedicine = {
-            ...medicineData,
-            userId: user.uid,
-            description: "Descrierea nu a putut fi regenerată.",
-          };
-          setDoc(docRef, updatedMedicine, { merge: true }).catch(
-            (serverError) => {
-              const permissionError = new FirestorePermissionError({
-                path: docRef.path,
-                operation: "update",
-                requestResourceData: updatedMedicine,
-              });
-              errorEmitter.emit("permission-error", permissionError);
-            }
-          );
-          update({
-            id: toastId,
+          errorEmitter.emit("permission-error", permissionError);
+          toast({
             variant: "destructive",
-            title: "Eroare AI",
-            description: "Descrierea nu a putut fi regenerată.",
+            title: "Eroare",
+            description: "Nu s-a putut actualiza medicamentul.",
           });
-        }
-      } else {
-        const medicineWithUser = { ...medicineData, userId: user.uid };
-        setDoc(docRef, medicineWithUser, { merge: true }).catch(
-          (serverError) => {
-            const permissionError = new FirestorePermissionError({
-              path: docRef.path,
-              operation: "update",
-              requestResourceData: medicineWithUser,
-            });
-            errorEmitter.emit("permission-error", permissionError);
-          }
-        );
-        toast({
-          title: "Medicament Actualizat",
-          description: `${medicine.name} a fost actualizat cu succes.`,
         });
-      }
     } else {
-      const { id, ...medicineData } = medicine;
       const collectionRef = collection(
         firestore,
         "users",
         user.uid,
         "medicines"
       );
-      const { id: toastId, update } = toast({
-        title: "Generare descriere...",
-        description: `Se generează descrierea pentru ${medicine.name} cu ajutorul AI.`,
+      const newMedicine = { ...medicine, userId: user.uid };
+      toast({
+        title: "Se adaugă...",
+        description: `Se adaugă ${medicine.name} în inventar.`,
       });
-      try {
-        const descResult = await generateMedicineDescription({
-          medicineName: medicine.name,
-        });
-        const newMedicine = {
-          ...medicineData,
-          userId: user.uid,
-          description: descResult.description,
-        };
-        addDoc(collectionRef, newMedicine).catch((serverError) => {
+      addDoc(collectionRef, newMedicine)
+        .then(() => {
+          toast({
+            title: "Medicament Adăugat",
+            description: `${medicine.name} a fost adăugat cu succes.`,
+          });
+        })
+        .catch((serverError) => {
           const permissionError = new FirestorePermissionError({
             path: collectionRef.path,
             operation: "create",
             requestResourceData: newMedicine,
           });
           errorEmitter.emit("permission-error", permissionError);
-        });
-        update({
-          id: toastId,
-          title: "Descriere Generată",
-          description: `Descrierea pentru ${newMedicine.name} a fost creată de AI.`,
-        });
-      } catch (error) {
-        console.error("Failed to generate description", error);
-        const newMedicine = {
-          ...medicineData,
-          userId: user.uid,
-          description: "Nu s-a putut genera descrierea.",
-        };
-        addDoc(collectionRef, newMedicine).catch((serverError) => {
-          const permissionError = new FirestorePermissionError({
-            path: collectionRef.path,
-            operation: "create",
-            requestResourceData: newMedicine,
+          toast({
+            variant: "destructive",
+            title: "Eroare",
+            description: "Nu s-a putut adăuga medicamentul.",
           });
-          errorEmitter.emit("permission-error", permissionError);
         });
-        update({
-          id: toastId,
-          variant: "destructive",
-          title: "Eroare AI",
-          description: "Descrierea nu a putut fi generată.",
-        });
-      }
     }
   };
 
@@ -286,11 +230,11 @@ export default function InventoryPage() {
 
   const filteredAndSortedMedicines = useMemo(() => {
     if (!medicines) return [];
-    
+
     const getStatusSortValue = (expiryDate: string) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const expiry = new Date(expiryDate);
+      const expiry = parseISO(expiryDate);
       const diffDays = Math.ceil(
         (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
       );
@@ -316,7 +260,7 @@ export default function InventoryPage() {
         if (statusFilter === "all") return true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const expiry = new Date(med.expiryDate);
+        const expiry = parseISO(med.expiryDate);
         const diffDays = Math.ceil(
           (expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
@@ -334,8 +278,8 @@ export default function InventoryPage() {
         }
 
         if (sortColumn === "expiryDate") {
-          const aValue = new Date(a.expiryDate).getTime();
-          const bValue = new Date(b.expiryDate).getTime();
+          const aValue = parseISO(a.expiryDate).getTime();
+          const bValue = parseISO(b.expiryDate).getTime();
           return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
         }
 

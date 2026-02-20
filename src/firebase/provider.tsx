@@ -46,6 +46,7 @@ export interface FirebaseServicesAndUser {
 export interface UserHookResult { // Renamed from UserAuthHookResult for consistency if desired, or keep as UserAuthHookResult
   user: User | null;
   isUserLoading: boolean;
+  loading: boolean; // Alias for isUserLoading
   userError: Error | null;
 }
 
@@ -154,14 +155,11 @@ export const useFirebaseApp = (): FirebaseApp => {
   return firebaseApp;
 };
 
-type MemoFirebase <T> = T & {__memo?: boolean};
-
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (T & { __memo: true }) {
   const memoized = useMemo(factory, deps);
   
   if(typeof memoized === 'object' && memoized !== null) {
-    (memoized as T & { __memo: true }).__memo = true;
-    return memoized as T & { __memo: true };
+    return Object.assign({}, memoized, { __memo: true }) as T & { __memo: true };
   }
   
   return memoized;
@@ -174,5 +172,5 @@ export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | 
  */
 export const useUser = (): UserHookResult => { // Renamed from useAuthUser
   const { user, isUserLoading, userError } = useFirebase(); // Leverages the main hook
-  return { user, isUserLoading, userError };
+  return { user, isUserLoading, loading: isUserLoading, userError };
 };

@@ -1,5 +1,4 @@
 import {genkit, modelRef} from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 import { openAICompatible } from '@genkit-ai/compat-oai';
 
 export const ai = genkit({
@@ -7,10 +6,8 @@ export const ai = genkit({
     openAICompatible({
       name: 'requesty',
       baseURL: 'https://router.requesty.ai/v1',
-      apiKey:
-        'rqsty-sk-G2OlCAhrRLak4xOeOaKQ+qsJTJCkd4PHtM31RlebV/Q1lyroX85yhlB+UmMstPWxcob85UExTdDYGchPKHIxHA5Ve4uc5YyYT3RG+5qQmwE=',
+      apiKey: process.env.REQUESTY_API_KEY,
     }),
-    googleAI(),
   ],
   model: 'requesty/mistral/devstral-latest',
 });

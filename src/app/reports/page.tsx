@@ -47,10 +47,10 @@ const TYPE_COLORS = [
   "#ff8042",
   "#00C49F",
   "#FFBB28",
-  "#FF8042",
   "#0088FE",
-  "#00C49F",
-  "#FFBB28",
+  "#ff6b6b",
+  "#4ecdc4",
+  "#45b7d1",
 ];
 
 export default function ReportsPage() {

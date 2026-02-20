@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { differenceInDays, parseISO } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import type { ExpiryStatus } from "@/lib/types";
@@ -29,14 +29,7 @@ const getExpiryStatus = (
 };
 
 export function StatusBadge({ expiryDate }: StatusBadgeProps) {
-  const [statusInfo, setStatusInfo] = useState<{
-    status: ExpiryStatus;
-    days: number | null;
-  }>({ status: "Valabil", days: null });
-
-  useEffect(() => {
-    setStatusInfo(getExpiryStatus(expiryDate));
-  }, [expiryDate]);
+  const statusInfo = useMemo(() => getExpiryStatus(expiryDate), [expiryDate]);
   
   const statusConfig = {
     "Expirat": {

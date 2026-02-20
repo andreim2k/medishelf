@@ -3,15 +3,18 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useAuth, useUser } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { LogoIcon } from "@/components/medishelf/logo-icon";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const auth = useAuth();
   const { user, loading } = useUser();
   const router = useRouter();
+  const { toast } = useToast();
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -21,11 +24,19 @@ export default function LoginPage() {
 
   const handleSignIn = async () => {
     if (!auth) return;
+    setIsSigningIn(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
     } catch (error) {
       console.error("Error signing in with Google", error);
+      toast({
+        variant: "destructive",
+        title: "Eroare la autentificare",
+        description: "Nu s-a putut autentifica cu Google. Verificați conexiunea.",
+      });
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -51,22 +62,26 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-        <Button onClick={handleSignIn} className="w-full">
-          <svg
-            className="mr-2 h-4 w-4"
-            aria-hidden="true"
-            focusable="false"
-            data-prefix="fab"
-            data-icon="google"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 488 512"
-          >
-            <path
-              fill="currentColor"
-              d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 266.2 0 129.8 109.8 20 244 20c74.3 0 134.3 29.3 179.8 72.8l-65.2 63.3c-23.3-22.5-55.4-36-94.6-36-71.3 0-129.8 58.7-129.8 130.3s58.5 130.3 129.8 130.3c76.3 0 115.3-51.5 119.5-77.9H244V261.8h244z"
-            ></path>
-          </svg>
+        <Button onClick={handleSignIn} className="w-full" disabled={isSigningIn}>
+          {isSigningIn ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <svg
+              className="mr-2 h-4 w-4"
+              aria-hidden="true"
+              focusable="false"
+              data-prefix="fab"
+              data-icon="google"
+              role="img"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 488 512"
+            >
+              <path
+                fill="currentColor"
+                d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 266.2 0 129.8 109.8 20 244 20c74.3 0 134.3 29.3 179.8 72.8l-65.2 63.3c-23.3-22.5-55.4-36-94.6-36-71.3 0-129.8 58.7-129.8 130.3s58.5 130.3 129.8 130.3c76.3 0 115.3-51.5 119.5-77.9H244V261.8h244z"
+              ></path>
+            </svg>
+          )}
           Autentificare cu Google
         </Button>
       </div>

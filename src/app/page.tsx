@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, Activity, Users, CreditCard, Loader2 } from "lucide-react";
+import { Package, Activity, AlertTriangle, AlertOctagon, Loader2 } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from "recharts";
 import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { parseISO } from "date-fns";
 import type { Medicine } from "@/lib/types";
 import { collection } from "firebase/firestore";
 
@@ -37,16 +38,16 @@ export default function Home() {
         return monthNames.map(name => ({ name, total: 0 }));
     }
 
+    const currentYear = new Date().getFullYear();
+    
     const monthlyCounts = medicines.reduce((acc, med) => {
         try {
-            const purchaseDate = new Date(med.purchaseDate);
-            // Check if the date is valid before processing
-            if (!isNaN(purchaseDate.getTime())) {
-                const month = purchaseDate.getMonth(); // 0-11
+            const purchaseDate = parseISO(med.purchaseDate);
+            if (!isNaN(purchaseDate.getTime()) && purchaseDate.getFullYear() === currentYear) {
+                const month = purchaseDate.getMonth();
                 acc[month] = (acc[month] || 0) + 1;
             }
         } catch (e) {
-            // Ignore medicines with invalid date format
         }
         return acc;
     }, {} as Record<number, number>);
@@ -80,7 +81,7 @@ export default function Home() {
                 }
             }
 
-            const purchaseDate = new Date(med.purchaseDate);
+            const purchaseDate = parseISO(med.purchaseDate);
             if (!isNaN(purchaseDate.getTime())) {
                 if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
                     acc.addedThisMonthCount++;
@@ -131,7 +132,7 @@ export default function Home() {
             <CardTitle className="text-sm font-medium">
               Expiră în curând
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{expiringSoonCount}</div>
@@ -143,7 +144,7 @@ export default function Home() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Expirate</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <AlertOctagon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">

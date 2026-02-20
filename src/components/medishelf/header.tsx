@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Package, BarChart2, PanelLeft, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LogoIcon } from "./logo-icon";
@@ -22,10 +23,18 @@ export function Header() {
   const pathname = usePathname();
   const auth = useAuth();
   const { user } = useUser();
+  const { toast } = useToast();
 
   const handleLogout = () => {
     if (auth) {
-      signOut(auth);
+      signOut(auth).catch((error) => {
+        console.error("Sign out failed:", error);
+        toast({
+          variant: "destructive",
+          title: "Eroare",
+          description: "Nu s-a putut efectua deconectarea.",
+        });
+      });
     }
   };
 

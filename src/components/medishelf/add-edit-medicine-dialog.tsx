@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import type { Medicine } from "@/lib/types";
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Loader2, Sparkles } from "lucide-react";
 
 import {
   Dialog,
@@ -36,6 +36,9 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { generateMedicineDescription } from "@/ai/flows/generate-medicine-description";
 import { Label } from "../ui/label";
 
 // ---------------------------------------------------------------------------
@@ -58,7 +61,10 @@ function DatePickerField({
   useEffect(() => {
     if (!open) return;
     function handleDown(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -71,10 +77,17 @@ function DatePickerField({
       <Button
         type="button"
         variant="outline"
-        className={cn("w-full pl-3 text-left font-normal", !value && "text-muted-foreground")}
+        className={cn(
+          "w-full pl-3 text-left font-normal",
+          !value && "text-muted-foreground"
+        )}
         onClick={() => setOpen((v) => !v)}
       >
-        {value ? format(value, "PPP", { locale: ro }) : <span>{placeholder}</span>}
+        {value ? (
+          format(value, "PPP", { locale: ro })
+        ) : (
+          <span>{placeholder}</span>
+        )}
         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
       </Button>
       {open && (
@@ -82,7 +95,10 @@ function DatePickerField({
           <Calendar
             mode="single"
             selected={value}
-            onSelect={(date) => { onChange(date); setOpen(false); }}
+            onSelect={(date) => {
+              onChange(date);
+              setOpen(false);
+            }}
             disabled={disabled}
             initialFocus
           />
@@ -124,12 +140,15 @@ const medicineSchema = z.object({
     .positive("Cantitatea trebuie să fie un număr pozitiv."),
   purchaseDate: z.date({ required_error: "Data cumpărării este obligatorie." }),
   expiryDate: z.date({ required_error: "Data expirării este obligatorie." }),
+  description: z.string().optional(),
 });
 
 type AddEditMedicineDialogProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSave: (medicine: any) => Promise<void>;
+  onSave: (
+    medicine: Omit<Medicine, "userId" | "id"> & { id?: string }
+  ) => Promise<void>;
   medicineToEdit?: Medicine;
 };
 
@@ -140,22 +159,33 @@ export function AddEditMedicineDialog({
   medicineToEdit,
 }: AddEditMedicineDialogProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof medicineSchema>>({
     resolver: zodResolver(medicineSchema),
     defaultValues: {
       name: "",
       medicineType: "Pastilă",
       quantity: 1,
+      description: "",
     },
   });
+
+  const {
+    formState: { isDirty },
+    watch,
+  } = form;
+  const watchedDescription = watch("description");
 
   useEffect(() => {
     if (isOpen) {
       if (medicineToEdit) {
         form.reset({
           ...medicineToEdit,
-          purchaseDate: new Date(medicineToEdit.purchaseDate),
+          purchaseDate: parseISO(medicineToEdit.purchaseDate),
           expiryDate: new Date(medicineToEdit.expiryDate),
+          description: medicineToEdit.description || "",
         });
       } else {
         form.reset({
@@ -165,10 +195,46 @@ export function AddEditMedicineDialog({
           quantity: 1,
           purchaseDate: new Date(),
           expiryDate: undefined,
+          description: "",
         });
       }
     }
   }, [medicineToEdit, isOpen, form]);
+
+  const handleGenerateDescription = async () => {
+    const medicineName = form.getValues("name");
+    if (!medicineName) {
+      form.setError("name", {
+        type: "manual",
+        message: "Introduceți un nume pentru a căuta descrierea.",
+      });
+      return;
+    }
+    setIsGenerating(true);
+    const { id: toastId, update } = toast({
+      title: "Generare descriere...",
+      description: `Se generează descrierea pentru ${medicineName} cu ajutorul AI.`,
+    });
+    try {
+      const result = await generateMedicineDescription({ medicineName });
+      form.setValue("description", result.description, { shouldDirty: true });
+      update({
+        id: toastId,
+        title: "Descriere Generată",
+        description: `Descrierea pentru ${medicineName} a fost creată de AI.`,
+      });
+    } catch (error) {
+      console.error("Failed to generate description", error);
+      update({
+        id: toastId,
+        variant: "destructive",
+        title: "Eroare AI",
+        description: "Descrierea nu a putut fi generată.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const renderDescription = (description?: string) => {
     if (!description) return null;
@@ -263,10 +329,12 @@ export function AddEditMedicineDialog({
 
   const onSubmit = async (values: z.infer<typeof medicineSchema>) => {
     setIsSaving(true);
+    const { id, ...rest } = values;
     const valuesToSave = {
-      ...values,
+      ...rest,
       purchaseDate: format(values.purchaseDate, "yyyy-MM-dd"),
       expiryDate: format(values.expiryDate, "yyyy-MM-dd"),
+      ...(id ? { id } : {}),
     };
 
     try {
@@ -303,9 +371,26 @@ export function AddEditMedicineDialog({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Nume</FormLabel>
-                  <FormControl>
-                    <Input placeholder="ex: Paracetamol 500mg" {...field} />
-                  </FormControl>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      <Input placeholder="ex: Paracetamol 500mg" {...field} />
+                    </FormControl>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleGenerateDescription}
+                      disabled={isGenerating || !field.value}
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <Sparkles />
+                      )}
+                      <span className="ml-2 hidden sm:inline">
+                        Căutare AI
+                      </span>
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -385,11 +470,6 @@ export function AddEditMedicineDialog({
                       <DatePickerField
                         value={field.value}
                         onChange={field.onChange}
-                        disabled={(date) => {
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0);
-                          return date < today;
-                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -398,14 +478,26 @@ export function AddEditMedicineDialog({
               />
             </div>
 
-            {medicineToEdit && medicineToEdit.description && (
-              <div className="space-y-2">
-                <Label>Descriere</Label>
-                <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
-                  {renderDescription(medicineToEdit.description)}
-                </div>
-              </div>
-            )}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descriere AI</FormLabel>
+                  <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
+                  {field.value ? (
+                    renderDescription(field.value)
+                  ) : (
+                    <p className="text-muted-foreground">
+                      Apasă "Căutare AI" pentru a genera o descriere.
+                    </p>
+                  )}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <DialogFooter className="pt-4">
               <Button
                 type="button"
@@ -415,7 +507,10 @@ export function AddEditMedicineDialog({
               >
                 Renunță
               </Button>
-              <Button type="submit" disabled={isSaving}>
+              <Button
+                type="submit"
+                disabled={isSaving || !isDirty || !watchedDescription}
+              >
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Salvează
               </Button>
