@@ -6,6 +6,7 @@ import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import { Checkbox } from "../ui/checkbox";
+import { MedicineTypeIcon } from "./medicine-type-icon";
 
 type MedicineListItemProps = {
   medicine: Medicine;
@@ -55,14 +56,24 @@ export function MedicineListItem({
         />
       </TableCell>
       <TableCell>
-        <div className="font-medium">{medicine.name}</div>
-        {medicine.description && (
-          <div className="hidden text-sm text-muted-foreground sm:block">
-            {truncatedDescription}
+        <div className="flex items-center gap-3">
+          <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted sm:flex">
+            <MedicineTypeIcon
+              type={medicine.medicineType}
+              className="h-5 w-5 text-muted-foreground"
+            />
           </div>
-        )}
-        <div className="text-sm text-muted-foreground lg:hidden">
-          Expiră {expiryDate}
+          <div>
+            <div className="font-medium">{medicine.name}</div>
+            {medicine.description && (
+              <div className="hidden text-sm text-muted-foreground sm:block">
+                {truncatedDescription}
+              </div>
+            )}
+            <div className="text-sm text-muted-foreground lg:hidden">
+              Expiră {expiryDate}
+            </div>
+          </div>
         </div>
       </TableCell>
       <TableCell className="hidden sm:table-cell">

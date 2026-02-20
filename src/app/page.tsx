@@ -20,6 +20,7 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebas
 import { parseISO } from "date-fns";
 import type { Medicine } from "@/lib/types";
 import { collection } from "firebase/firestore";
+import { MedicineTypeIcon } from "@/components/medishelf/medicine-type-icon";
 
 export default function Home() {
   const { user } = useUser();
@@ -221,7 +222,7 @@ export default function Home() {
             {medicines?.slice(0, 4).map((med) => (
               <div className="flex items-center" key={med.id}>
                 <div className="mr-4 flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                  <Package className="h-5 w-5 text-muted-foreground" />
+                  <MedicineTypeIcon type={med.medicineType} className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="flex-grow">
                   <p className="text-sm font-medium leading-none">{med.name}</p>

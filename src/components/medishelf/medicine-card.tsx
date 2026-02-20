@@ -14,6 +14,7 @@ import { StatusBadge } from "./status-badge";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { MedicineTypeIcon } from "./medicine-type-icon";
 
 type MedicineCardProps = {
   medicine: Medicine;
@@ -64,7 +65,7 @@ export function MedicineCard({
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-             <div onClick={(e) => e.stopPropagation()}>
+            <div onClick={(e) => e.stopPropagation()}>
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => onSelect(medicine.id)}
@@ -80,7 +81,13 @@ export function MedicineCard({
           </div>
           <StatusBadge expiryDate={medicine.expiryDate} />
         </div>
-        <CardDescription>{medicine.medicineType}</CardDescription>
+        <CardDescription className="flex items-center gap-2 pt-1">
+          <MedicineTypeIcon
+            type={medicine.medicineType}
+            className="h-4 w-4 text-muted-foreground"
+          />
+          {medicine.medicineType}
+        </CardDescription>
       </CardHeader>
       <CardContent
         className="flex-grow cursor-pointer space-y-4"

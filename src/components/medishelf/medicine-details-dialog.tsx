@@ -8,10 +8,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Calendar, Package, Pill } from "lucide-react";
+import { Calendar, Package } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ro } from "date-fns/locale";
 import { StatusBadge } from "./status-badge";
+import { MedicineTypeIcon } from "./medicine-type-icon";
 
 type MedicineDetailsDialogProps = {
   isOpen: boolean;
@@ -119,7 +120,7 @@ export function MedicineDetailsDialog({
             <StatusBadge expiryDate={medicine.expiryDate} />
           </div>
           <DialogDescription className="flex items-center gap-1.5 pt-1">
-            <Pill className="h-4 w-4" />
+            <MedicineTypeIcon type={medicine.medicineType} className="h-4 w-4" />
             {medicine.medicineType}
           </DialogDescription>
         </DialogHeader>
