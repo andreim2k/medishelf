@@ -482,7 +482,7 @@ export function AddEditMedicineDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descriere AI</FormLabel>
+                  <FormLabel>Prospect medicament</FormLabel>
                   <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
                   {field.value ? (
                     renderDescription(field.value)
