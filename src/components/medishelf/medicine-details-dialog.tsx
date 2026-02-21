@@ -1,6 +1,7 @@
 "use client";
 
 import type { Medicine } from "@/lib/types";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -43,7 +44,7 @@ export function MedicineDetailsDialog({
         if (part.startsWith('*') && part.endsWith('*')) {
           return <i key={i}>{part.slice(1, -1)}</i>;
         }
-        return part;
+        return <React.Fragment key={i}>{part}</React.Fragment>;
       });
     };
 

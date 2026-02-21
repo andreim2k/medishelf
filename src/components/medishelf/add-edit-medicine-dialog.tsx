@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -244,7 +244,7 @@ export function AddEditMedicineDialog({
         if (part.startsWith('*') && part.endsWith('*')) {
           return <i key={i}>{part.slice(1, -1)}</i>;
         }
-        return part;
+        return <React.Fragment key={i}>{part}</React.Fragment>;
       });
     };
 
