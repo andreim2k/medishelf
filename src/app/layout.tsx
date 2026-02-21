@@ -44,6 +44,9 @@ export default function RootLayout({
             ) : (
               <AuthGuard key="auth-guard">
                 <>
+                  {/* ── Fixed ambient gradient background (before orbs, z-index:-1) ── */}
+                  <div className="bg-gradient-ambient" aria-hidden="true" />
+
                   {/* ── Floating ambient orbs ── */}
                   <div
                     className="bg-orb animate-float"
@@ -104,11 +107,11 @@ export default function RootLayout({
                   />
 
                   {/* ── App shell ── */}
-                  <div className="relative flex min-h-screen w-full flex-col">
+                  <div className="relative w-full">
                     <Sidebar />
-                    <div className="flex flex-1 flex-col sm:pl-16">
+                    <div className="sm:pl-16 pt-16 min-h-screen flex flex-col">
                       <Header />
-                      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                      <main className="flex-1 flex flex-col gap-4 p-4 md:gap-8 md:p-8">
                         {children}
                       </main>
                       <footer className="p-4 text-center text-xs text-muted-foreground">
