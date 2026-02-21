@@ -221,8 +221,8 @@ export default function Home() {
           <CardContent className="space-y-4">
             {medicines?.slice(0, 4).map((med) => (
               <div className="flex items-center" key={med.id}>
-                <div className="mr-4 flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
-                  <MedicineTypeIcon type={med.medicineType} className="h-5 w-5 text-muted-foreground" />
+                <div className="mr-4 flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                  <MedicineTypeIcon type={med.medicineType} className="h-5 w-5" />
                 </div>
                 <div className="flex-grow">
                   <p className="text-sm font-medium leading-none">{med.name}</p>

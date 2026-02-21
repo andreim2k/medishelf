@@ -57,10 +57,10 @@ export function MedicineListItem({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-3">
-          <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted sm:flex">
+          <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted sm:flex">
             <MedicineTypeIcon
               type={medicine.medicineType}
-              className="h-5 w-5 text-muted-foreground"
+              className="h-5 w-5"
             />
           </div>
           <div>
