@@ -7,7 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package, Activity, AlertTriangle, AlertOctagon, Loader2 } from "lucide-react";
+import {
+  Package,
+  Activity,
+  AlertTriangle,
+  AlertOctagon,
+  Loader2,
+  BarChart2,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -16,7 +23,12 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import {
+  useCollection,
+  useFirestore,
+  useUser,
+  useMemoFirebase,
+} from "@/firebase";
 import { parseISO } from "date-fns";
 import type { Medicine } from "@/lib/types";
 import { collection } from "firebase/firestore";
@@ -34,9 +46,22 @@ export default function Home() {
   const { data: medicines, loading } = useCollection<Medicine>(medicinesQuery);
 
   const chartData = useMemo(() => {
-    const monthNames = ["Ian", "Feb", "Mar", "Apr", "Mai", "Iun", "Iul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const monthNames = [
+      "Ian",
+      "Feb",
+      "Mar",
+      "Apr",
+      "Mai",
+      "Iun",
+      "Iul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     if (!medicines) {
-      return monthNames.map(name => ({ name, total: 0 }));
+      return monthNames.map((name) => ({ name, total: 0 }));
     }
 
     const currentYear = new Date().getFullYear();
@@ -44,7 +69,10 @@ export default function Home() {
     const monthlyCounts = medicines.reduce((acc, med) => {
       try {
         const purchaseDate = parseISO(med.purchaseDate);
-        if (!isNaN(purchaseDate.getTime()) && purchaseDate.getFullYear() === currentYear) {
+        if (
+          !isNaN(purchaseDate.getTime()) &&
+          purchaseDate.getFullYear() === currentYear
+        ) {
           const month = purchaseDate.getMonth();
           acc[month] = (acc[month] || 0) + 1;
         }
@@ -59,7 +87,8 @@ export default function Home() {
   }, [medicines]);
 
   const { expiringSoonCount, expiredCount, addedThisMonthCount } = useMemo(() => {
-    if (!medicines) return { expiringSoonCount: 0, expiredCount: 0, addedThisMonthCount: 0 };
+    if (!medicines)
+      return { expiringSoonCount: 0, expiredCount: 0, addedThisMonthCount: 0 };
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const currentMonth = today.getMonth();
@@ -82,7 +111,10 @@ export default function Home() {
 
           const purchaseDate = parseISO(med.purchaseDate);
           if (!isNaN(purchaseDate.getTime())) {
-            if (purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear) {
+            if (
+              purchaseDate.getMonth() === currentMonth &&
+              purchaseDate.getFullYear() === currentYear
+            ) {
               acc.addedThisMonthCount++;
             }
           }
@@ -101,13 +133,16 @@ export default function Home() {
           <div
             className="h-14 w-14 rounded-2xl flex items-center justify-center animate-pulse-glow"
             style={{
-              background: "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,214,245,0.15))",
+              background:
+                "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,214,245,0.15))",
               border: "1px solid rgba(255,255,255,0.15)",
             }}
           >
             <Loader2 className="h-7 w-7 animate-spin text-primary" />
           </div>
-          <p className="text-sm text-muted-foreground animate-fade-in">Se încarcă inventarul...</p>
+          <p className="text-sm text-muted-foreground animate-fade-in">
+            Se încarcă inventarul...
+          </p>
         </div>
       </div>
     );
@@ -151,7 +186,9 @@ export default function Home() {
           >
             {medicines?.length || 0}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">medicamente în inventar</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            medicamente în inventar
+          </p>
         </div>
 
         {/* Expiring soon */}
@@ -169,11 +206,16 @@ export default function Home() {
           </div>
           <div
             className="text-3xl font-bold tracking-tight"
-            style={{ fontFamily: "Space Grotesk, sans-serif", color: "rgb(234, 179, 8)" }}
+            style={{
+              fontFamily: "Space Grotesk, sans-serif",
+              color: "rgb(234, 179, 8)",
+            }}
           >
             {expiringSoonCount}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">în următoarele 30 zile</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            în următoarele 30 zile
+          </p>
         </div>
 
         {/* Expired */}
@@ -191,11 +233,16 @@ export default function Home() {
           </div>
           <div
             className="text-3xl font-bold tracking-tight"
-            style={{ fontFamily: "Space Grotesk, sans-serif", color: "rgb(239, 68, 68)" }}
+            style={{
+              fontFamily: "Space Grotesk, sans-serif",
+              color: "rgb(239, 68, 68)",
+            }}
           >
             {expiredCount}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">medicamente expirate</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            medicamente expirate
+          </p>
         </div>
 
         {/* Activity */}
@@ -213,11 +260,16 @@ export default function Home() {
           </div>
           <div
             className="text-3xl font-bold tracking-tight"
-            style={{ fontFamily: "Space Grotesk, sans-serif", color: "rgb(6, 214, 245)" }}
+            style={{
+              fontFamily: "Space Grotesk, sans-serif",
+              color: "rgb(6, 214, 245)",
+            }}
           >
             +{addedThisMonthCount}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">adăugate luna aceasta</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            adăugate luna aceasta
+          </p>
         </div>
       </div>
 
@@ -237,48 +289,78 @@ export default function Home() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <XAxis
-                  dataKey="name"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v) => `${v}`}
-                />
-                <Tooltip
-                  cursor={{ fill: "rgba(168,85,247,0.08)", radius: 6 }}
-                  contentStyle={{
-                    background: "rgba(15, 20, 40, 0.85)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
-                    color: "hsl(var(--foreground))",
-                    fontSize: "12px",
-                  }}
-                  labelStyle={{ color: "hsl(var(--muted-foreground))", fontWeight: 600 }}
-                />
-                <Bar
-                  dataKey="total"
-                  fill="url(#barGradient)"
-                  radius={[6, 6, 0, 0]}
-                />
-                <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity={0.7} />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
+            {!medicines || medicines.length === 0 ? (
+              <div className="flex h-[300px] flex-col items-center justify-center gap-4 text-center">
+                <div className="rounded-full border border-dashed p-4 text-muted-foreground/80">
+                  <BarChart2 className="h-10 w-10 text-muted-foreground/60" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold">
+                    Grafic indisponibil
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Adaugă medicamente pentru a vizualiza rezumatul.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="name"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => `${v}`}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(168,85,247,0.08)", radius: 6 }}
+                    contentStyle={{
+                      background: "rgba(15, 20, 40, 0.85)",
+                      backdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "12px",
+                      boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                      color: "hsl(var(--foreground))",
+                      fontSize: "12px",
+                    }}
+                    labelStyle={{
+                      color: "hsl(var(--muted-foreground))",
+                      fontWeight: 600,
+                    }}
+                  />
+                  <Bar
+                    dataKey="total"
+                    fill="url(#barGradient)"
+                    radius={[6, 6, 0, 0]}
+                  />
+                  <defs>
+                    <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor="hsl(var(--primary))"
+                        stopOpacity={0.9}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="hsl(var(--accent))"
+                        stopOpacity={0.7}
+                      />
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -303,11 +385,18 @@ export default function Home() {
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="medicine-icon-circle h-10 w-10 flex-shrink-0">
-                  <MedicineTypeIcon type={med.medicineType} className="h-4 w-4" />
+                  <MedicineTypeIcon
+                    type={med.medicineType}
+                    className="h-4 w-4"
+                  />
                 </div>
                 <div className="min-w-0 flex-grow">
-                  <p className="truncate text-sm font-semibold leading-none">{med.name}</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{med.medicineType}</p>
+                  <p className="truncate text-sm font-semibold leading-none">
+                    {med.name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {med.medicineType}
+                  </p>
                 </div>
                 <div
                   className="flex-shrink-0 rounded-lg px-2 py-1 text-xs font-bold tabular-nums"
@@ -329,7 +418,9 @@ export default function Home() {
                 >
                   <Package className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <p className="text-sm text-muted-foreground">Niciun medicament adăugat.</p>
+                <p className="text-sm text-muted-foreground">
+                  Niciun medicament adăugat.
+                </p>
               </div>
             )}
           </CardContent>
