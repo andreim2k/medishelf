@@ -54,8 +54,8 @@
 
     /* Header — light: near-white frosted */
     --header-bg-r: 245; --header-bg-g: 246; --header-bg-b: 250;
-    --header-bg-opacity: 0.88;
-    --header-border-opacity: 0.5;
+    --header-bg-opacity: 0.75;
+    --header-border-opacity: 0.3;
   }
 
   .dark {
@@ -108,8 +108,8 @@
 
     /* Header — dark: deep navy, slightly translucent for blur to show */
     --header-bg-r: 8; --header-bg-g: 10; --header-bg-b: 24;
-    --header-bg-opacity: 0.82;
-    --header-border-opacity: 0.12;
+    --header-bg-opacity: 0.65;
+    --header-border-opacity: 0.1;
   }
 }
 

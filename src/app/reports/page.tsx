@@ -30,7 +30,7 @@ import { ro } from "date-fns/locale";
 import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { Medicine } from "@/lib/types";
-import { Loader2 } from "lucide-react";
+import { Loader2, BarChart2 } from "lucide-react";
 
 const COLORS = {
   safe: "hsl(var(--success))",
@@ -135,6 +135,28 @@ export default function ReportsPage() {
       <div className="flex h-full items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
+    );
+  }
+
+  if (!medicines || medicines.length === 0) {
+    return (
+      <>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+            Rapoarte și Analize
+          </h1>
+        </div>
+        <div className="flex flex-grow flex-col items-center justify-center gap-4 rounded-xl border border-dashed py-24 text-center">
+          <div className="rounded-full border border-dashed p-4">
+            <BarChart2 className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <h2 className="text-xl font-semibold">Nu există date pentru rapoarte</h2>
+          <p className="max-w-md text-muted-foreground">
+            Adaugă medicamente în inventar pentru a vedea statistici despre
+            statusul de expirare și distribuția pe tipuri.
+          </p>
+        </div>
+      </>
     );
   }
 

@@ -53,8 +53,7 @@ export function Header() {
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="sm:max-w-xs glass border-white/10"
-          style={{ backdropFilter: "blur(28px) saturate(200%)" }}
+          className="sm:max-w-xs glass-sidebar"
         >
           <SheetTitle className="sr-only">Meniu navigare</SheetTitle>
           <nav className="grid gap-6 text-lg font-medium pt-4">
