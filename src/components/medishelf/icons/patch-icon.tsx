@@ -13,7 +13,7 @@ export const PatchIcon = (props: SVGProps<SVGSVGElement>) => (
       width="16"
       height="16"
       rx="2"
-      stroke="currentColor"
+      stroke="hsl(var(--warning))"
       strokeWidth="2"
     />
     <rect
@@ -22,7 +22,7 @@ export const PatchIcon = (props: SVGProps<SVGSVGElement>) => (
       width="8"
       height="8"
       rx="1"
-      fill="currentColor"
+      fill="hsl(var(--warning))"
       fillOpacity="0.2"
     />
   </svg>

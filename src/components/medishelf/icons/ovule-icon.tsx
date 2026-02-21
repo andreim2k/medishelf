@@ -12,8 +12,10 @@ export const OvuleIcon = (props: SVGProps<SVGSVGElement>) => (
       cy="12"
       rx="6"
       ry="8"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
+      fill="hsl(var(--primary))"
+      fillOpacity="0.2"
     />
   </svg>
 );

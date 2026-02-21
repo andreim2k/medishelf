@@ -7,10 +7,10 @@ export const OtherIcon = (props: SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+    <circle cx="12" cy="12" r="10" stroke="hsl(var(--muted-foreground))" strokeWidth="2" fill="hsl(var(--muted-foreground))" fillOpacity="0.2" />
     <path
       d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
-      stroke="currentColor"
+      stroke="hsl(var(--muted-foreground))"
       strokeWidth="2"
       strokeLinecap="round"
     />
@@ -19,7 +19,7 @@ export const OtherIcon = (props: SVGProps<SVGSVGElement>) => (
       y1="17"
       x2="12.01"
       y2="17"
-      stroke="currentColor"
+      stroke="hsl(var(--muted-foreground))"
       strokeWidth="2"
       strokeLinecap="round"
     />

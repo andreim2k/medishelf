@@ -9,14 +9,14 @@ export const InhalerIcon = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       d="M12 10C14.2091 10 16 8.20914 16 6V3H8V6C8 8.20914 9.79086 10 12 10Z"
-      stroke="currentColor"
+      stroke="hsl(var(--success))"
       strokeWidth="2"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--success))"
+      fillOpacity="0.2"
     />
     <path
       d="M16 10v9a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-9"
-      stroke="currentColor"
+      stroke="hsl(var(--success))"
       strokeWidth="2"
     />
   </svg>

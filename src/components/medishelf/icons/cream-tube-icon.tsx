@@ -9,16 +9,16 @@ export const CreamTubeIcon = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       d="M4 21h16L14 3H10L4 21z"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--accent))"
+      fillOpacity="0.2"
     />
     <path
       d="M10 3h4"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

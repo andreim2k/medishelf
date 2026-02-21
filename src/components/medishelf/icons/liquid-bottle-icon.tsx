@@ -9,23 +9,23 @@ export const LiquidBottleIcon = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       d="M7 21V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v15"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--accent))"
+      fillOpacity="0.2"
     />
     <path
       d="M5 21h14"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
      <path
       d="M9 3h6"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

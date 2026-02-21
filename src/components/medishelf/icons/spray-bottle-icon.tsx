@@ -13,22 +13,22 @@ export const SprayBottleIcon = (props: SVGProps<SVGSVGElement>) => (
       width="10"
       height="13"
       rx="2"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--accent))"
+      fillOpacity="0.2"
     />
-    <path d="M12 9V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    <path d="M10 3h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path d="M12 9V5" stroke="hsl(var(--accent))" strokeWidth="2" strokeLinecap="round" />
+    <path d="M10 3h4" stroke="hsl(var(--accent))" strokeWidth="2" strokeLinecap="round" />
     <path
       d="M16 5H20"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
     />
     <path
       d="M22 3v4"
-      stroke="currentColor"
+      stroke="hsl(var(--accent))"
       strokeWidth="2"
       strokeLinecap="round"
     />

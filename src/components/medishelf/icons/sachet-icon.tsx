@@ -9,23 +9,23 @@ export const SachetIcon = (props: SVGProps<SVGSVGElement>) => (
   >
     <path
       d="M5 3L19 4V20L5 19V3Z"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--primary))"
+      fillOpacity="0.2"
     />
     <path
       d="M10 8L14 12"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M14 8L10 12"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

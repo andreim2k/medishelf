@@ -13,15 +13,17 @@ export const SuppositoryIcon = (props: SVGProps<SVGSVGElement>) => (
       width="6"
       height="13"
       rx="3"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
+      fill="hsl(var(--primary))"
+      fillOpacity="0.2"
     />
     <path
       d="M12 2L15 9H9L12 2Z"
-      stroke="currentColor"
+      stroke="hsl(var(--primary))"
       strokeWidth="2"
-      fill="currentColor"
-      fillOpacity="0.1"
+      fill="hsl(var(--primary))"
+      fillOpacity="0.2"
     />
   </svg>
 );
