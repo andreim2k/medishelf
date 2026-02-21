@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { differenceInDays, parseISO } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import type { ExpiryStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Shield, ShieldAlert, ShieldX } from "lucide-react";
@@ -30,44 +29,43 @@ const getExpiryStatus = (
 
 export function StatusBadge({ expiryDate }: StatusBadgeProps) {
   const statusInfo = useMemo(() => getExpiryStatus(expiryDate), [expiryDate]);
-  
+
   const statusConfig = {
     "Expirat": {
-      className:
-        "bg-destructive/20 text-destructive-foreground border-destructive/30 hover:bg-destructive/30",
-      icon: <ShieldX className="mr-1.5 h-3.5 w-3.5" />,
+      className: "badge-expired",
+      icon: <ShieldX className="h-3 w-3" />,
       text: "Expirat",
     },
     "Expiră în curând": {
-      className:
-        "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30",
-      icon: <ShieldAlert className="mr-1.5 h-3.5 w-3.5" />,
-      text: `Expiră în ${statusInfo.days} zile`,
+      className: "badge-expiring",
+      icon: <ShieldAlert className="h-3 w-3" />,
+      text: `${statusInfo.days}z`,
     },
     "Valabil": {
-      className:
-        "bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30",
-      icon: <Shield className="mr-1.5 h-3.5 w-3.5" />,
+      className: "badge-valid",
+      icon: <Shield className="h-3 w-3" />,
       text: "Valabil",
     },
     "Dată Invalidă": {
-      className: "bg-muted text-muted-foreground",
+      className: "badge-invalid",
       icon: null,
-      text: "Dată Invalidă",
+      text: "—",
     },
   };
 
   const config = statusConfig[statusInfo.status];
-  
+
   if (!config) return null;
 
   return (
-    <Badge
-      variant="outline"
-      className={cn("whitespace-nowrap", config.className)}
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap tracking-wide",
+        config.className
+      )}
     >
       {config.icon}
       {config.text}
-    </Badge>
+    </span>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Package, BarChart2, PanelLeft, LogOut } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -39,27 +39,39 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center gap-4 px-6 glass-header">
+      {/* Mobile menu trigger */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button size="icon" variant="outline" className="sm:hidden">
+          <Button size="icon" variant="ghost" className="sm:hidden">
             <PanelLeft className="h-5 w-5" />
             <span className="sr-only">Comută Meniu</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
-          <nav className="grid gap-6 text-lg font-medium">
+        <SheetContent
+          side="left"
+          className="sm:max-w-xs glass border-white/10"
+          style={{ backdropFilter: "blur(28px) saturate(200%)" }}
+        >
+          <SheetTitle className="sr-only">Meniu navigare</SheetTitle>
+          <nav className="grid gap-6 text-lg font-medium pt-4">
             <Link
               href="/"
               className="group flex items-center gap-3 text-lg font-semibold"
             >
-              <LogoIcon className="h-7 w-7 flex-shrink-0" />
-              <span
-                className="font-bold tracking-tight"
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-xl"
                 style={{
-                  fontFamily: "Space Grotesk, sans-serif",
-                  color: "hsl(var(--primary))",
+                  background: "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,214,245,0.15))",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  boxShadow: "0 0 16px rgba(168,85,247,0.2)",
                 }}
+              >
+                <LogoIcon className="h-5 w-5" />
+              </div>
+              <span
+                className="gradient-text font-bold tracking-tight text-xl"
+                style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
                 medVentory
               </span>
@@ -69,8 +81,10 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground",
-                  pathname === item.href && "text-foreground"
+                  "flex items-center gap-4 px-3 py-2 rounded-xl transition-all duration-300",
+                  pathname === item.href
+                    ? "nav-glow-active text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/8"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -81,42 +95,62 @@ export function Header() {
         </SheetContent>
       </Sheet>
 
-      <div className="hidden items-center gap-2 sm:flex">
-        <LogoIcon className="h-7 w-7" />
+      {/* Desktop logo */}
+      <div className="hidden items-center gap-3 sm:flex">
         <div
-          className="text-2xl font-bold tracking-tight"
+          className="flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-300 hover:scale-105"
           style={{
-            fontFamily: "Space Grotesk, sans-serif",
-            color: "hsl(var(--primary))",
+            background: "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,214,245,0.15))",
+            border: "1px solid rgba(255,255,255,0.15)",
+            boxShadow: "0 0 16px rgba(168,85,247,0.2)",
           }}
+        >
+          <LogoIcon className="h-4 w-4" />
+        </div>
+        <div
+          className="gradient-text text-xl font-bold tracking-tight"
+          style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
           medVentory
         </div>
       </div>
 
+      {/* Mobile logo */}
       <Link href="/" className="flex items-center gap-2 sm:hidden">
-        <LogoIcon className="h-7 w-7" />
         <div
-          className="text-xl font-bold tracking-tight"
+          className="flex h-8 w-8 items-center justify-center rounded-xl"
           style={{
-            fontFamily: "Space Grotesk, sans-serif",
-            color: "hsl(var(--primary))",
+            background: "linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,214,245,0.15))",
+            border: "1px solid rgba(255,255,255,0.15)",
           }}
+        >
+          <LogoIcon className="h-4 w-4" />
+        </div>
+        <div
+          className="gradient-text text-lg font-bold tracking-tight"
+          style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
           medVentory
         </div>
       </Link>
 
-      <div className="flex flex-1 items-center justify-end gap-4">
+      {/* Right side actions */}
+      <div className="flex flex-1 items-center justify-end gap-2">
         {user && (
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user.photoURL || undefined} />
-              <AvatarFallback>
-                {user.displayName?.charAt(0) || user.email?.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-          </div>
+          <Avatar
+            className="h-8 w-8 avatar-glow cursor-pointer transition-transform hover:scale-105"
+          >
+            <AvatarImage src={user.photoURL || undefined} />
+            <AvatarFallback
+              className="text-xs font-semibold"
+              style={{
+                background: "linear-gradient(135deg, rgba(168,85,247,0.3), rgba(6,214,245,0.2))",
+                color: "hsl(var(--primary))",
+              }}
+            >
+              {user.displayName?.charAt(0) || user.email?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
         )}
         <ThemeToggle />
         <Button
@@ -124,8 +158,9 @@ export function Header() {
           size="icon"
           onClick={handleLogout}
           aria-label="Deconectare"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut className="h-[1.1rem] w-[1.1rem]" />
         </Button>
       </div>
     </header>

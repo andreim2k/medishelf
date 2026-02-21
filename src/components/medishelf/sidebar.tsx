@@ -11,7 +11,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 const navItems = [
   { href: "/", label: "Panou de control", icon: Home },
   { href: "/inventory", label: "Inventar", icon: Package },
@@ -22,28 +21,53 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
-      <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+    <aside className="fixed inset-y-0 left-0 z-50 hidden w-16 flex-col glass-sidebar sm:flex">
+      {/* Nav items */}
+      <nav className="flex flex-1 flex-col items-center gap-2 px-2 py-4">
         <TooltipProvider>
-          {navItems.map((item) => (
-            <Tooltip key={item.href}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
-                    pathname === item.href && "bg-accent text-accent-foreground"
-                  )}
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Tooltip key={item.href}>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300",
+                      isActive
+                        ? "nav-glow-active"
+                        : "text-muted-foreground hover:text-foreground hover:bg-white/8 hover:shadow-[0_0_12px_rgba(168,85,247,0.1)]"
+                    )}
+                  >
+                    <item.icon
+                      className={cn(
+                        "h-[1.1rem] w-[1.1rem] transition-all duration-300",
+                        isActive ? "scale-110" : ""
+                      )}
+                    />
+                    <span className="sr-only">{item.label}</span>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="right"
+                  className="glass border-white/15 text-foreground backdrop-blur-xl"
+                  style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}
                 >
-                  <item.icon className="h-5 w-5" />
-                  <span className="sr-only">{item.label}</span>
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent side="right">{item.label}</TooltipContent>
-            </Tooltip>
-          ))}
+                  {item.label}
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </TooltipProvider>
       </nav>
+
+      {/* Bottom gradient line */}
+      <div
+        className="mx-auto mt-auto mb-4 h-16 w-0.5 rounded-full"
+        style={{
+          background: "linear-gradient(to bottom, transparent, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), 0.4), transparent)",
+        }}
+      />
     </aside>
   );
 }
