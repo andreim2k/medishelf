@@ -48,59 +48,61 @@ export default function RootLayout({
                   <div className="bg-gradient-ambient" aria-hidden="true" />
 
                   {/* ── Floating ambient orbs ── */}
+                  {/* Multi-stop gradients simulate the soft glow without filter:blur,
+                      which was blocking backdrop-filter on the header */}
                   <div
                     className="bg-orb animate-float"
                     style={{
-                      width: "45vw",
-                      height: "45vw",
-                      maxWidth: "700px",
-                      maxHeight: "700px",
-                      top: "-15%",
-                      left: "-10%",
+                      width: "60vw",
+                      height: "60vw",
+                      maxWidth: "900px",
+                      maxHeight: "900px",
+                      top: "-20%",
+                      left: "-15%",
                       background:
-                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), var(--orb-opacity, 0.18)) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.7)) 0%, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.3)) 40%, transparent 70%)",
                       animationDuration: "9s",
                     }}
                   />
                   <div
                     className="bg-orb animate-float-delayed"
                     style={{
-                      width: "40vw",
-                      height: "40vw",
-                      maxWidth: "600px",
-                      maxHeight: "600px",
-                      top: "10%",
-                      right: "-8%",
+                      width: "55vw",
+                      height: "55vw",
+                      maxWidth: "800px",
+                      maxHeight: "800px",
+                      top: "5%",
+                      right: "-12%",
                       background:
-                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.8)) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.6)) 0%, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.2)) 45%, transparent 72%)",
                       animationDuration: "12s",
                     }}
                   />
                   <div
                     className="bg-orb animate-float-slow"
                     style={{
-                      width: "35vw",
-                      height: "35vw",
-                      maxWidth: "500px",
-                      maxHeight: "500px",
-                      bottom: "5%",
-                      left: "30%",
+                      width: "50vw",
+                      height: "50vw",
+                      maxWidth: "700px",
+                      maxHeight: "700px",
+                      bottom: "0%",
+                      left: "25%",
                       background:
-                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.6)) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.45)) 0%, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.15)) 50%, transparent 75%)",
                       animationDuration: "15s",
                     }}
                   />
                   <div
                     className="bg-orb animate-float"
                     style={{
-                      width: "30vw",
-                      height: "30vw",
-                      maxWidth: "400px",
-                      maxHeight: "400px",
-                      bottom: "15%",
-                      right: "10%",
+                      width: "45vw",
+                      height: "45vw",
+                      maxWidth: "600px",
+                      maxHeight: "600px",
+                      bottom: "10%",
+                      right: "5%",
                       background:
-                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.5)) 0%, transparent 70%)",
+                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.4)) 0%, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.1)) 50%, transparent 75%)",
                       animationDuration: "11s",
                       animationDelay: "3s",
                     }}

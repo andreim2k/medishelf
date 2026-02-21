@@ -42,7 +42,13 @@ export function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 sm:left-16 z-40 flex h-16 items-center gap-4 px-6 glass-header">
+    <header
+      className="fixed top-0 left-0 right-0 sm:left-16 z-40 flex h-16 items-center gap-4 px-6 glass-header"
+      style={{
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+      }}
+    >
       {/* Mobile menu trigger */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>

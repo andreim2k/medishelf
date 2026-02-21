@@ -237,9 +237,8 @@
   /* ── Header Glass ── */
   .glass-header {
     background: rgba(var(--header-bg-r), var(--header-bg-g), var(--header-bg-b), var(--header-bg-opacity));
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    transform: translateZ(0); /* Force own GPU compositing layer for backdrop-filter */
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, var(--header-border-opacity));
     border-top: none;
     border-left: none;
@@ -396,10 +395,12 @@
   }
 
   /* ── Floating Orb Background Decorations ── */
+  /* NOTE: No filter:blur here — sibling fixed elements with filter create
+     separate GPU render surfaces that break backdrop-filter on the header.
+     Softness is achieved via multi-stop gradients in layout.tsx instead. */
   .bg-orb {
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
     pointer-events: none;
     z-index: 0;
   }
