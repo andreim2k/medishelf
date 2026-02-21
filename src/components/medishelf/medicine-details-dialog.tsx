@@ -40,12 +40,16 @@ export function MedicineDetailsDialog({
 
     const renderWithItalics = (text: string) => {
       const parts = text.split(/(\*.*?\*)/g);
-      return parts.map((part, i) => {
-        if (part.startsWith('*') && part.endsWith('*')) {
-          return <i key={i}>{part.slice(1, -1)}</i>;
-        }
-        return <React.Fragment key={i}>{part}</React.Fragment>;
-      });
+      return (
+        <React.Fragment>
+          {parts.map((part, i) => {
+            if (part.startsWith('*') && part.endsWith('*')) {
+              return <i key={i}>{part.slice(1, -1)}</i>;
+            }
+            return <React.Fragment key={i}>{part}</React.Fragment>;
+          })}
+        </React.Fragment>
+      );
     };
 
     const sections: { title: string; content: string[] }[] = [];
@@ -74,42 +78,46 @@ export function MedicineDetailsDialog({
     if (currentSection) {
       sections.push(currentSection);
     }
-    
-    return sections.map((section, index) => {
-      const isSideEffects = section.title.toLowerCase().includes('efecte secundare');
-      let sideEffectsComment: string | null = null;
-      let listItems = section.content;
 
-      if (isSideEffects && listItems.length > 1) {
-          const lastLine = listItems[listItems.length - 1];
-          if(lastLine.toLowerCase().startsWith('aceste') || lastLine.toLowerCase().startsWith('dacă')) {
-              sideEffectsComment = listItems.pop() || null;
+    return (
+      <>
+        {sections.map((section, index) => {
+          const isSideEffects = section.title.toLowerCase().includes('efecte secundare');
+          let sideEffectsComment: string | null = null;
+          let listItems = section.content;
+
+          if (isSideEffects && listItems.length > 1) {
+              const lastLine = listItems[listItems.length - 1];
+              if(lastLine.toLowerCase().startsWith('aceste') || lastLine.toLowerCase().startsWith('dacă')) {
+                  sideEffectsComment = listItems.pop() || null;
+              }
           }
-      }
 
-      return (
-        <div key={index}>
-          <h4 className="font-semibold text-foreground tracking-tight">{section.title}</h4>
-          <div className="mt-2 space-y-1">
-          {isSideEffects && listItems.length > 0 ? (
-            <>
-              {listItems.map((item, itemIndex) => (
-                <div key={itemIndex} className="flex items-start">
-                  <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
-                  <span className="text-muted-foreground">{renderWithItalics(item)}</span>
-                </div>
-              ))}
-              {sideEffectsComment && (
-                 <p className="text-sm text-muted-foreground/80 pt-2">{renderWithItalics(sideEffectsComment)}</p>
+          return (
+            <div key={index}>
+              <h4 className="font-semibold text-foreground tracking-tight">{section.title}</h4>
+              <div className="mt-2 space-y-1">
+              {isSideEffects && listItems.length > 0 ? (
+                <>
+                  {listItems.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex items-start">
+                      <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
+                      <span className="text-muted-foreground">{renderWithItalics(item)}</span>
+                    </div>
+                  ))}
+                  {sideEffectsComment && (
+                     <p className="text-sm text-muted-foreground/80 pt-2">{renderWithItalics(sideEffectsComment)}</p>
+                  )}
+                </>
+              ) : (
+                <p className="text-muted-foreground">{renderWithItalics(section.content.join('\n'))}</p>
               )}
-            </>
-          ) : (
-            <p className="text-muted-foreground">{renderWithItalics(section.content.join('\n'))}</p>
-          )}
-          </div>
-        </div>
-      );
-    });
+              </div>
+            </div>
+          );
+        })}
+      </>
+    );
   };
 
   return (

@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -39,9 +40,11 @@ export default function RootLayout({
         <ThemeProvider>
           <FirebaseClientProvider>
             {isLoginPage ? (
-              children
+              <React.Fragment key="login-content">
+                {children}
+              </React.Fragment>
             ) : (
-              <AuthGuard>
+              <AuthGuard key="auth-guard">
                 <>
                   {/* ── Floating ambient orbs ── */}
                   <div
@@ -111,7 +114,7 @@ export default function RootLayout({
                 </>
               </AuthGuard>
             )}
-            <Toaster />
+            <Toaster key="toaster" />
           </FirebaseClientProvider>
         </ThemeProvider>
       </body>
