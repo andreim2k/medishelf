@@ -91,7 +91,7 @@ function DatePickerField({
         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
       </Button>
       {open && (
-        <div className="absolute left-0 top-[calc(100%+4px)] z-[200] rounded-md border bg-popover shadow-md">
+        <div className="absolute left-1/2 top-[calc(100%+4px)] z-[200] w-auto -translate-x-1/2 rounded-md border bg-popover shadow-md md:left-0 md:translate-x-0">
           <Calendar
             mode="single"
             selected={value}
