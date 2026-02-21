@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -12,6 +13,7 @@ import { LogoIcon } from "./logo-icon";
 import { useAuth, useUser } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useState } from "react";
 
 const navItems = [
   { href: "/", label: "Panou de control", icon: Home },
@@ -24,6 +26,7 @@ export function Header() {
   const auth = useAuth();
   const { user } = useUser();
   const { toast } = useToast();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleLogout = () => {
     if (auth) {
@@ -41,7 +44,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 flex h-16 w-full items-center gap-4 px-6 glass-header">
       {/* Mobile menu trigger */}
-      <Sheet>
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetTrigger asChild>
           <Button size="icon" variant="ghost" className="sm:hidden">
             <PanelLeft className="h-5 w-5" />
@@ -58,6 +61,7 @@ export function Header() {
             <Link
               href="/"
               className="group flex items-center gap-3 text-lg font-semibold"
+              onClick={() => setIsSheetOpen(false)}
             >
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-xl"
@@ -86,6 +90,7 @@ export function Header() {
                     ? "nav-glow-active text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-white/8"
                 )}
+                onClick={() => setIsSheetOpen(false)}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}
