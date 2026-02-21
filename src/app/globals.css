@@ -54,7 +54,7 @@
 
     /* Header — light: near-white frosted */
     --header-bg-r: 245; --header-bg-g: 246; --header-bg-b: 250;
-    --header-bg-opacity: 0.75;
+    --header-bg-opacity: 0.5;
     --header-border-opacity: 0.3;
   }
 
@@ -108,7 +108,7 @@
 
     /* Header — dark: deep navy, slightly translucent for blur to show */
     --header-bg-r: 8; --header-bg-g: 10; --header-bg-b: 24;
-    --header-bg-opacity: 0.65;
+    --header-bg-opacity: 0.5;
     --header-border-opacity: 0.1;
   }
 }
@@ -222,8 +222,8 @@
   /* ── Header Glass ── */
   .glass-header {
     background: rgba(var(--header-bg-r), var(--header-bg-g), var(--header-bg-b), var(--header-bg-opacity));
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, var(--header-border-opacity));
     border-top: none;
     border-left: none;
