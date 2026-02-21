@@ -283,7 +283,7 @@ export function AddEditMedicineDialog({
     }
 
     return (
-      <>
+      <React.Fragment>
         {sections.map((section, index) => {
           const isSideEffects = section.title
             .toLowerCase()
@@ -308,7 +308,7 @@ export function AddEditMedicineDialog({
               </h4>
               <div className="mt-2 space-y-1">
                 {isSideEffects && listItems.length > 0 ? (
-                  <>
+                  <React.Fragment>
                     {listItems.map((item, itemIndex) => (
                       <div key={itemIndex} className="flex items-start">
                         <span className="mr-2.5 mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70"></span>
@@ -320,7 +320,7 @@ export function AddEditMedicineDialog({
                         {renderWithItalics(sideEffectsComment)}
                       </p>
                     )}
-                  </>
+                  </React.Fragment>
                 ) : (
                   <p className="text-muted-foreground">
                     {renderWithItalics(section.content.join("\n"))}
@@ -330,7 +330,7 @@ export function AddEditMedicineDialog({
             </div>
           );
         })}
-      </>
+      </React.Fragment>
     );
   };
 
@@ -356,7 +356,7 @@ export function AddEditMedicineDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>
             {medicineToEdit ? "Editează Medicament" : "Adaugă Medicament"}
@@ -367,164 +367,167 @@ export function AddEditMedicineDialog({
               : "Adăugați un medicament nou în inventarul dvs."}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 px-2"
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nume</FormLabel>
-                  <div className="flex items-center gap-2">
-                    <FormControl>
-                      <Input placeholder="ex: Paracetamol 500mg" {...field} />
-                    </FormControl>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleGenerateDescription}
-                      disabled={isGenerating || !field.value}
-                    >
-                      {isGenerating ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        <Sparkles />
-                      )}
-                      <span className="ml-2 hidden sm:inline">
-                        Căutare AI
-                      </span>
-                    </Button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
+        <div className="flex-grow overflow-y-auto -mx-6 px-6">
+          <Form {...form}>
+            <form
+              id="add-edit-medicine-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={form.control}
-                name="quantity"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cantitate</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="medicineType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tip</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
+                    <FormLabel>Nume</FormLabel>
+                    <div className="flex items-center gap-2">
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selectează tip" />
-                        </SelectTrigger>
+                        <Input placeholder="ex: Paracetamol 500mg" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {medicineTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleGenerateDescription}
+                        disabled={isGenerating || !field.value}
+                      >
+                        {isGenerating ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          <Sparkles />
+                        )}
+                        <span className="ml-2 hidden sm:inline">
+                          Căutare AI
+                        </span>
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="purchaseDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data Cumpărării</FormLabel>
-                    <FormControl>
-                      <DatePickerField
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="expiryDate"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data Expirării</FormLabel>
-                    <FormControl>
-                      <DatePickerField
-                        value={field.value}
-                        onChange={field.onChange}
-                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prospect medicament</FormLabel>
-                  <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
-                  {field.value ? (
-                    renderDescription(field.value)
-                  ) : (
-                    <p className="text-muted-foreground">
-                      Apasă "Căutare AI" pentru a genera o descriere.
-                    </p>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cantitate</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                />
+                <FormField
+                  control={form.control}
+                  name="medicineType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tip</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selectează tip" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {medicineTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            <DialogFooter className="pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={isSaving}
-              >
-                Renunță
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSaving || !isDirty || !watchedDescription}
-              >
-                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Salvează
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="purchaseDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data Cumpărării</FormLabel>
+                      <FormControl>
+                        <DatePickerField
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="expiryDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data Expirării</FormLabel>
+                      <FormControl>
+                        <DatePickerField
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prospect medicament</FormLabel>
+                    <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/50 p-3 text-sm space-y-4">
+                    {field.value ? (
+                      renderDescription(field.value)
+                    ) : (
+                      <p className="text-muted-foreground">
+                        Apasă "Căutare AI" pentru a genera o descriere.
+                      </p>
+                    )}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+        <DialogFooter className="pt-4 flex-shrink-0 flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:space-x-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+            disabled={isSaving}
+          >
+            Renunță
+          </Button>
+          <Button
+            type="submit"
+            form="add-edit-medicine-form"
+            disabled={isSaving || !isDirty || !watchedDescription}
+          >
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Salvează
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
