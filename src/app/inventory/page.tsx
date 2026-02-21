@@ -480,13 +480,13 @@ export default function InventoryPage() {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
-                <Download className="mr-2 h-4 w-4" />
-                Importă
+              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="sm:w-auto w-10 px-0 sm:px-3">
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Importă</span>
               </Button>
-              <Button onClick={handleAddClick}>
-                <Plus className="mr-2 h-4 w-4" />
-                Adaugă Medicament
+              <Button onClick={handleAddClick} className="sm:w-auto w-10 px-0 sm:px-3">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Adaugă Medicament</span>
               </Button>
             </>
           )}

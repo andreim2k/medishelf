@@ -122,7 +122,7 @@ export function MedicineDetailsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl flex flex-col max-h-[85vh]">
         <DialogHeader>
           <div className="flex items-center gap-4">
             <DialogTitle className="text-2xl">{medicine.name}</DialogTitle>
@@ -133,36 +133,38 @@ export function MedicineDetailsDialog({
             {medicine.medicineType}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="max-w-none text-sm space-y-4">
-            {renderDescription(medicine.description)}
-          </div>
+        <div className="overflow-y-auto">
+          <div className="grid gap-6 py-4 px-1">
+            <div className="max-w-none text-sm space-y-4">
+              {renderDescription(medicine.description)}
+            </div>
 
-          <div className="mt-2 grid grid-cols-2 gap-4 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Package className="h-4 w-4" />
-              <span>
-                Cantitate:{" "}
-                <span className="font-medium text-foreground">
-                  {medicine.quantity}
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Package className="h-4 w-4" />
+                <span>
+                  Cantitate:{" "}
+                  <span className="font-medium text-foreground">
+                    {medicine.quantity}
+                  </span>
                 </span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span>
-                Cumpărat:{" "}
-                <span className="font-medium text-foreground">
-                  {purchaseDate}
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>
+                  Cumpărat:{" "}
+                  <span className="font-medium text-foreground">
+                    {purchaseDate}
+                  </span>
                 </span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="mr-2 h-4 w-4 text-destructive/80" />
-              <span>
-                Expiră:{" "}
-                <span className="font-medium text-foreground">{expiryDate}</span>
-              </span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar className="mr-2 h-4 w-4 text-destructive/80" />
+                <span>
+                  Expiră:{" "}
+                  <span className="font-medium text-foreground">{expiryDate}</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
