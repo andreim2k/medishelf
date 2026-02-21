@@ -77,7 +77,7 @@ export function Header() {
                 className="gradient-text font-bold tracking-tight text-xl"
                 style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
-                medVentory
+                mediShelf
               </span>
             </Link>
             {navItems.map((item) => (
@@ -116,7 +116,7 @@ export function Header() {
           className="gradient-text text-xl font-bold tracking-tight"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
-          medVentory
+          mediShelf
         </div>
       </div>
 
@@ -135,7 +135,7 @@ export function Header() {
           className="gradient-text text-lg font-bold tracking-tight"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
-          medVentory
+          mediShelf
         </div>
       </Link>
 

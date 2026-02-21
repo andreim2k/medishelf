@@ -295,7 +295,7 @@ export default function InventoryPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "mediventory_export.json";
+    link.download = "medishelf_export.json";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -480,12 +480,12 @@ export default function InventoryPage() {
                   <List className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="sm:w-auto w-10 px-0 sm:px-3">
-                <Download className="h-4 w-4" />
+              <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} size="sm" className="sm:w-auto w-10 !p-0 sm:!px-3">
+                <Download className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Importă</span>
               </Button>
-              <Button onClick={handleAddClick} className="sm:w-auto w-10 px-0 sm:px-3">
-                <Plus className="h-4 w-4" />
+              <Button onClick={handleAddClick} size="sm" className="sm:w-auto w-10 !p-0 sm:!px-3">
+                <Plus className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Adaugă Medicament</span>
               </Button>
             </>

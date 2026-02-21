@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ro" suppressHydrationWarning className="dark">
       <head>
-        <title>medVentory</title>
+        <title>mediShelf</title>
         <meta
           name="description"
           content="Organizează-ți medicamentele inteligent."
@@ -40,9 +40,7 @@ export default function RootLayout({
         <ThemeProvider>
           <FirebaseClientProvider>
             {isLoginPage ? (
-              <React.Fragment key="login-content">
-                {children}
-              </React.Fragment>
+              <React.Fragment key="login-content">{children}</React.Fragment>
             ) : (
               <AuthGuard key="auth-guard">
                 <>
@@ -56,7 +54,8 @@ export default function RootLayout({
                       maxHeight: "700px",
                       top: "-15%",
                       left: "-10%",
-                      background: "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), var(--orb-opacity, 0.18)) 0%, transparent 70%)",
+                      background:
+                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), var(--orb-opacity, 0.18)) 0%, transparent 70%)",
                       animationDuration: "9s",
                     }}
                   />
@@ -69,7 +68,8 @@ export default function RootLayout({
                       maxHeight: "600px",
                       top: "10%",
                       right: "-8%",
-                      background: "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.8)) 0%, transparent 70%)",
+                      background:
+                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.8)) 0%, transparent 70%)",
                       animationDuration: "12s",
                     }}
                   />
@@ -82,7 +82,8 @@ export default function RootLayout({
                       maxHeight: "500px",
                       bottom: "5%",
                       left: "30%",
-                      background: "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.6)) 0%, transparent 70%)",
+                      background:
+                        "radial-gradient(circle, rgba(var(--glow-primary-r, 168), var(--glow-primary-g, 85), var(--glow-primary-b, 247), calc(var(--orb-opacity, 0.18) * 0.6)) 0%, transparent 70%)",
                       animationDuration: "15s",
                     }}
                   />
@@ -95,7 +96,8 @@ export default function RootLayout({
                       maxHeight: "400px",
                       bottom: "15%",
                       right: "10%",
-                      background: "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.5)) 0%, transparent 70%)",
+                      background:
+                        "radial-gradient(circle, rgba(var(--glow-accent-r, 6), var(--glow-accent-g, 214), var(--glow-accent-b, 245), calc(var(--orb-opacity, 0.18) * 0.5)) 0%, transparent 70%)",
                       animationDuration: "11s",
                       animationDelay: "3s",
                     }}
@@ -104,11 +106,14 @@ export default function RootLayout({
                   {/* ── App shell ── */}
                   <div className="relative flex min-h-screen w-full flex-col">
                     <Sidebar />
-                    <div className="flex flex-col sm:gap-4 sm:pb-4 sm:pl-16">
+                    <div className="flex flex-1 flex-col sm:pl-16">
                       <Header />
                       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
                         {children}
                       </main>
+                      <footer className="p-4 text-center text-xs text-muted-foreground">
+                        <p>&copy; 2026 by Techware. All rights reserved.</p>
+                      </footer>
                     </div>
                   </div>
                 </>

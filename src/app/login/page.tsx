@@ -121,7 +121,7 @@ export default function LoginPage() {
               className="gradient-text text-3xl font-bold tracking-tight"
               style={{ fontFamily: "Space Grotesk, sans-serif" }}
             >
-              medVentory
+              mediShelf
             </h1>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
               Organizează-ți medicamentele inteligent.<br />Autentifică-te pentru a continua.
@@ -159,6 +159,9 @@ export default function LoginPage() {
           {isSigningIn ? "Se conectează..." : "Autentificare cu Google"}
         </Button>
       </div>
+      <footer className="absolute bottom-4 w-full text-center text-xs text-muted-foreground">
+        <p>&copy; 2026 by Techware. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
